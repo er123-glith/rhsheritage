@@ -1,0 +1,303 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../views/**/*.blade.php';
+@source '../js/**/*.js';
+
+@theme {
+  /* ── Primary — Forest ───────────────────────────── */
+  --color-primary-50: #E6F2EC;
+  --color-primary-100: #C4DBD1;
+  --color-primary-200: #99BFB1;
+  --color-primary-300: #6BA08D;
+  --color-primary-400: #45846F;
+  --color-primary-500: #2A6B56;
+  --color-primary-600: #1A5442;
+  --color-primary-700: #0F3D2E;
+  --color-primary-800: #0A2A1F;
+  --color-primary-900: #051710;
+  --color-primary: #0F3D2E;
+
+  /* ── Secondary — Gold ───────────────────────────── */
+  --color-gold-50: #FBF7EA;
+  --color-gold-100: #F5EDD5;
+  --color-gold-200: #EEDFB2;
+  --color-gold-300: #E6CF87;
+  --color-gold-400: #DDBF5C;
+  --color-gold-500: #D4AF37;
+  --color-gold-600: #C09B30;
+  --color-gold-700: #A08429;
+  --color-gold-800: #6E5B1D;
+  --color-gold-900: #4A3D12;
+  --color-gold: #D4AF37;
+
+  /* ── Neutral — Charcoal ─────────────────────────── */
+  --color-neutral-50: #F4F4F4;
+  --color-neutral-100: #E8E8E8;
+  --color-neutral-200: #D4D4D4;
+  --color-neutral-300: #B5B5B5;
+  --color-neutral-400: #8F8F8F;
+  --color-neutral-500: #6B6B6B;
+  --color-neutral-600: #444444;
+  --color-neutral-700: #2C2C2C;
+  --color-neutral-800: #1E1E1E;
+  --color-neutral-900: #121212;
+  --color-neutral: #2C2C2C;
+
+  /* ── Surface ────────────────────────────────────── */
+  --color-canvas-base: #F7F4EC;
+  --color-canvas-raised: #FFFFFF;
+  --color-canvas-sunken: #EFEBE0;
+
+  /* ── Semantik ───────────────────────────────────── */
+  --color-success: #2E7D4F;
+  --color-success-bg: #E6F2EC;
+  --color-warning: #B8860B;
+  --color-warning-bg: #F5EDD5;
+  --color-danger: #C0392B;
+  --color-danger-bg: #FBEAE8;
+  --color-info: #2A6B56;
+  --color-price-sale: #C0392B;
+  --color-price-strike: #8F8F8F;
+
+  /* ── Tipografi — Modern Apple / iPhone SF Pro Stack ─────── */
+  --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Plus Jakarta Sans", "Inter", system-ui, sans-serif;
+  --font-body: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Plus Jakarta Sans", system-ui, sans-serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Inter", "Plus Jakarta Sans", system-ui, sans-serif;
+
+  /* ── Radius ─────────────────────────────────────── */
+  --radius-sm: 6px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+  --radius-xl: 16px;
+  --radius-pill: 999px;
+
+  /* ── Elevasi ────────────────────────────────────── */
+  --shadow-1: 0 1px 2px rgba(15, 61, 46, .06);
+  --shadow-2: 0 4px 12px rgba(15, 61, 46, .10);
+  --shadow-3: 0 12px 32px rgba(15, 61, 46, .14);
+}
+
+@layer base {
+  body {
+    background-color: var(--color-canvas-base);
+    color: var(--color-neutral-700);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    letter-spacing: -0.011em;
+    transition: background-color 0.2s ease, color 0.2s ease;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-display);
+    letter-spacing: -0.022em;
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-primary-500);
+    outline-offset: 2px;
+  }
+}
+
+/* ── Dark Mode Full Inversion & Contrast Rules ───── */
+.dark {
+  color-scheme: dark;
+  background-color: #0d1512 !important;
+  color: #e5ede9 !important;
+}
+
+.dark body {
+  background-color: #0d1512 !important;
+  color: #e5ede9 !important;
+}
+
+.dark .bg-canvas-base {
+  background-color: #0d1512 !important;
+}
+
+.dark .bg-white {
+  background-color: #15221d !important;
+  color: #e5ede9 !important;
+}
+
+.dark .bg-canvas-sunken {
+  background-color: #080f0c !important;
+}
+
+.dark .bg-canvas-raised {
+  background-color: #15221d !important;
+}
+
+.dark .bg-neutral-50,
+.dark .bg-neutral-100 {
+  background-color: #182822 !important;
+}
+
+.dark .text-neutral-900,
+.dark .text-neutral-800 {
+  color: #f3f7f5 !important;
+}
+
+.dark .text-neutral-700 {
+  color: #dbe5e1 !important;
+}
+
+.dark .text-neutral-600,
+.dark .text-neutral-500 {
+  color: #9cb5ab !important;
+}
+
+.dark .border-neutral-100,
+.dark .border-neutral-200,
+.dark .border-neutral-300 {
+  border-color: #243830 !important;
+}
+
+.dark .divide-neutral-100> :not([hidden])~ :not([hidden]),
+.dark .divide-neutral-200> :not([hidden])~ :not([hidden]) {
+  border-color: #243830 !important;
+}
+
+.dark header.bg-white\/95 {
+  background-color: rgba(21, 34, 29, 0.95) !important;
+  border-color: #243830 !important;
+}
+
+.dark input:not([type="checkbox"]):not([type="radio"]):not([type="submit"]):not([type="button"]):not([type="color"]),
+.dark select,
+.dark textarea {
+  background-color: #080f0c !important;
+  color: #f3f7f5 !important;
+  border-color: #243830 !important;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+  color: #769186 !important;
+}
+
+/* ── Theme Toggle Icon Helpers ───────────────────── */
+html:not(.dark) .js-theme-icon-sun {
+  display: none !important;
+}
+
+html.dark .js-theme-icon-moon {
+  display: none !important;
+}
+
+html:not(.dark) .js-theme-text-dark {
+  display: none !important;
+}
+
+html.dark .js-theme-text-light {
+  display: none !important;
+}
+
+/* ── AOS Animation Enhancements ──────────────────── */
+html,
+body {
+  overflow-x: clip;
+}
+
+[data-aos] {
+  pointer-events: auto;
+  will-change: transform, opacity;
+}
+
+[data-aos="fade-up"] {
+  transform: translate3d(0, 24px, 0);
+}
+
+[data-aos="fade-down"] {
+  transform: translate3d(0, -24px, 0);
+}
+
+[data-aos="fade-right"] {
+  transform: translate3d(-24px, 0, 0);
+}
+
+[data-aos="fade-left"] {
+  transform: translate3d(24px, 0, 0);
+}
+
+/* ── SweetAlert2 RHS Heritage Custom Theme ────────── */
+.swal2-popup.rhs-swal-popup {
+  border-radius: 1.25rem !important;
+  font-family: var(--font-body) !important;
+  box-shadow: 0 20px 40px -15px rgba(15, 61, 46, 0.25) !important;
+  border: 1px solid rgba(228, 228, 231, 0.8) !important;
+  padding: 1.75rem !important;
+}
+
+.rhs-swal-title {
+  font-family: var(--font-display) !important;
+  font-weight: 700 !important;
+  font-size: 1.35rem !important;
+  letter-spacing: -0.02em !important;
+}
+
+.rhs-swal-confirm {
+  border-radius: 0.65rem !important;
+  padding: 0.65rem 1.4rem !important;
+  font-weight: 700 !important;
+  font-size: 0.875rem !important;
+  box-shadow: 0 4px 12px rgba(15, 61, 46, 0.15) !important;
+  transition: all 0.2s ease !important;
+}
+
+.rhs-swal-confirm:hover {
+  filter: brightness(1.1);
+  transform: translateY(-1px);
+}
+
+.rhs-swal-cancel {
+  border-radius: 0.65rem !important;
+  padding: 0.65rem 1.25rem !important;
+  font-weight: 600 !important;
+  font-size: 0.875rem !important;
+  background-color: #f4f4f5 !important;
+  color: #52525b !important;
+  transition: all 0.2s ease !important;
+}
+
+.rhs-swal-cancel:hover {
+  background-color: #e4e4e7 !important;
+  color: #18181b !important;
+}
+
+/* Dark Mode SweetAlert2 */
+.dark .swal2-popup.rhs-swal-popup,
+.dark .swal2-popup {
+  background-color: #14201B !important;
+  color: #F7F4EC !important;
+  border-color: #243830 !important;
+  box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.6) !important;
+}
+
+.dark .swal2-title {
+  color: #F7F4EC !important;
+}
+
+.dark .swal2-html-container {
+  color: #9cb5ab !important;
+}
+
+.dark .rhs-swal-cancel {
+  background-color: #243830 !important;
+  color: #C4DBD1 !important;
+}
+
+.dark .rhs-swal-cancel:hover {
+  background-color: #2d453c !important;
+  color: #ffffff !important;
+}

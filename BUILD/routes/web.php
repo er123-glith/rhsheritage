@@ -1,0 +1,84 @@
+<?php
+
+use App\Http\Controllers\Public\AboutController;
+use App\Http\Controllers\Public\CartController;
+use App\Http\Controllers\Public\CatalogController;
+use App\Http\Controllers\Public\CheckoutController;
+use App\Http\Controllers\Public\HomeController;
+use App\Http\Controllers\Public\OrderController;
+use App\Http\Controllers\Public\PartnershipController;
+use App\Http\Controllers\Public\ProductController;
+use Illuminate\Support\Facades\Route;
+
+/*
+|--------------------------------------------------------------------------
+| Public Routes — Halaman yang bisa diakses tamu (tanpa login)
+|--------------------------------------------------------------------------
+*/
+
+// Beranda
+Route::get('/', [HomeController::class, 'index'])->name('home');
+
+// Katalog Produk
+Route::get('/katalog', [CatalogController::class, 'index'])->name('catalog.index');
+Route::get('/katalog/kategori/{category:slug}', [CatalogController::class, 'category'])->name('catalog.category');
+
+// Detail Produk
+Route::get('/produk/{product:slug}', [ProductController::class, 'show'])->name('product.show');
+
+// Keranjang Belanja
+Route::get('/keranjang', [CartController::class, 'index'])->name('cart.index');
+Route::post('/keranjang', [CartController::class, 'store'])->name('cart.store');
+Route::patch('/keranjang/{variantId}', [CartController::class, 'update'])->name('cart.update');
+Route::delete('/keranjang/{variantId}', [CartController::class, 'destroy'])->name('cart.destroy');
+
+// Checkout & Pesanan
+Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
+Route::post('/checkout/ongkir', [CheckoutController::class, 'shipping'])->name('checkout.shipping');
+Route::post('/checkout', [CheckoutController::class, 'store'])
+    ->middleware('throttle:5,1')
+    ->name('checkout.store');
+
+// Konfirmasi & Lacak Pesanan
+Route::get('/pesanan/{orderNumber}', [OrderController::class, 'confirmation'])->name('order.confirmation');
+Route::get('/lacak-pesanan', [OrderController::class, 'trackForm'])->name('order.track');
+Route::post('/lacak-pesanan', [OrderController::class, 'track'])
+    ->middleware('throttle:10,1')
+    ->name('order.track.submit');
+
+// Grosir & Mitra
+Route::get('/grosir-mitra', [PartnershipController::class, 'index'])->name('partnership.index');
+Route::post('/grosir-mitra', [PartnershipController::class, 'store'])
+    ->middleware('throttle:5,1')
+    ->name('partnership.store');
+
+// Tentang Kami
+Route::get('/tentang', [AboutController::class, 'index'])->name('about');
+
+// Helper route migrasi cPanel (bisa dihapus setelah setup selesai)
+Route::get('/setup-cpanel-migrate', function () {
+    try {
+        \Illuminate\Support\Facades\Artisan::call('migrate:fresh --seed --force');
+        $migrateOutput = \Illuminate\Support\Facades\Artisan::output();
+
+        try {
+            \Illuminate\Support\Facades\Artisan::call('storage:link');
+            $storageOutput = \Illuminate\Support\Facades\Artisan::output();
+        } catch (\Throwable $e) {
+            $storageOutput = 'Storage link notice: ' . $e->getMessage();
+        }
+
+        return '<pre style="background:#111;color:#0f0;padding:20px;font-family:monospace;font-size:14px;border-radius:8px;">'
+            . "=== HASIL MIGRASI & SEEDER ===\n\n"
+            . htmlspecialchars($migrateOutput)
+            . "\n\n=== STORAGE LINK ===\n\n"
+            . htmlspecialchars($storageOutput)
+            . '</pre>';
+    } catch (\Throwable $e) {
+        return '<pre style="background:#111;color:#f33;padding:20px;font-family:monospace;font-size:14px;border-radius:8px;">'
+            . "=== ERROR MIGRASI ===\n\n"
+            . htmlspecialchars($e->getMessage()) . "\n\n"
+            . htmlspecialchars($e->getTraceAsString())
+            . '</pre>';
+    }
+});
