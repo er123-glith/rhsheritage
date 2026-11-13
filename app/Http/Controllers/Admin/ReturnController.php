@@ -26,7 +26,17 @@ class ReturnController extends Controller
             ->latest('id');
 
         if ($status = $request->input('status')) {
-            $query->where('status', $status);
+            if ($status === 'dalam_penyelesaian') {
+                $query->whereIn('status', [
+                    ReturnStatus::Disetujui,
+                    ReturnStatus::MenungguBarangBalik,
+                    ReturnStatus::BarangDiperiksa,
+                    ReturnStatus::DalamPenyelesaian,
+                    ReturnStatus::PerluInformasi,
+                ]);
+            } else {
+                $query->where('status', $status);
+            }
         }
 
         if ($solution = $request->input('solution')) {
@@ -58,8 +68,17 @@ class ReturnController extends Controller
         $rejectedCount      = OrderReturn::where('status', ReturnStatus::Ditolak)->count();
         $totalCount         = OrderReturn::count();
 
+        $counts = [
+            'all'                => $totalCount,
+            'menunggu_review'    => $pendingReviewCount,
+            'dalam_penyelesaian' => $inProgressCount,
+            'selesai'            => $completedCount,
+            'ditolak'            => $rejectedCount,
+        ];
+
         return view('admin.returns.index', compact(
             'returns',
+            'counts',
             'pendingReviewCount',
             'inProgressCount',
             'completedCount',
@@ -359,3 +378,4 @@ class ReturnController extends Controller
         return back()->with('status', 'Bukti transfer pengembalian dana berhasil dicatat. Menunggu konfirmasi penerimaan oleh pelanggan.');
     }
 }
+

@@ -146,6 +146,15 @@ class OrderSeeder extends Seeder
         );
 
         OrderStatusLog::firstOrCreate(
+            ['order_id' => $o3->id, 'to_status' => OrderStatus::MenungguKonfirmasi->value],
+            [
+                'from_status' => null,
+                'note' => 'Pesanan berhasil dibuat oleh pelanggan via form checkout',
+                'created_at' => now()->subDay(),
+            ]
+        );
+
+        OrderStatusLog::firstOrCreate(
             ['order_id' => $o3->id, 'to_status' => OrderStatus::Diproses->value],
             [
                 'from_status' => OrderStatus::MenungguKonfirmasi->value,
@@ -175,6 +184,7 @@ class OrderSeeder extends Seeder
                 'tracking_number' => 'JNE-88239102910',
                 'sent_to_wa_at' => now()->subDays(2),
                 'confirmed_at' => now()->subDays(2)->addHour(),
+                'shipping_date' => now()->subDays(1),
             ]
         );
 
@@ -186,6 +196,24 @@ class OrderSeeder extends Seeder
                 'unit_price' => $v1->price,
                 'quantity' => 1,
                 'subtotal' => $v1->price,
+            ]
+        );
+
+        OrderStatusLog::firstOrCreate(
+            ['order_id' => $o4->id, 'to_status' => OrderStatus::MenungguKonfirmasi->value],
+            [
+                'from_status' => null,
+                'note' => 'Pesanan berhasil dibuat oleh pelanggan via form checkout',
+                'created_at' => now()->subDays(2),
+            ]
+        );
+
+        OrderStatusLog::firstOrCreate(
+            ['order_id' => $o4->id, 'to_status' => OrderStatus::Diproses->value],
+            [
+                'from_status' => OrderStatus::MenungguKonfirmasi->value,
+                'note' => 'Dikonfirmasi oleh owner via panel admin',
+                'created_at' => now()->subDays(2)->addHour(),
             ]
         );
 
@@ -219,6 +247,8 @@ class OrderSeeder extends Seeder
                 'tracking_number' => 'GRAB-EXPRESS-1029',
                 'sent_to_wa_at' => now()->subDays(4),
                 'confirmed_at' => now()->subDays(4)->addHour(),
+                'shipping_date' => now()->subDays(3),
+                'delivered_at' => now()->subDays(2),
             ]
         );
 
@@ -230,6 +260,33 @@ class OrderSeeder extends Seeder
                 'unit_price' => $v2->price,
                 'quantity' => 1,
                 'subtotal' => $v2->price,
+            ]
+        );
+
+        OrderStatusLog::firstOrCreate(
+            ['order_id' => $o5->id, 'to_status' => OrderStatus::MenungguKonfirmasi->value],
+            [
+                'from_status' => null,
+                'note' => 'Pesanan berhasil dibuat oleh pelanggan via form checkout',
+                'created_at' => now()->subDays(4),
+            ]
+        );
+
+        OrderStatusLog::firstOrCreate(
+            ['order_id' => $o5->id, 'to_status' => OrderStatus::Diproses->value],
+            [
+                'from_status' => OrderStatus::MenungguKonfirmasi->value,
+                'note' => 'Dikonfirmasi oleh owner via panel admin',
+                'created_at' => now()->subDays(4)->addHour(),
+            ]
+        );
+
+        OrderStatusLog::firstOrCreate(
+            ['order_id' => $o5->id, 'to_status' => OrderStatus::Dikirim->value],
+            [
+                'from_status' => OrderStatus::Diproses->value,
+                'note' => 'Nomor resi pengiriman: GRAB-EXPRESS-1029',
+                'created_at' => now()->subDays(3),
             ]
         );
 
@@ -273,6 +330,15 @@ class OrderSeeder extends Seeder
                 'unit_price' => $v1->price,
                 'quantity' => 1,
                 'subtotal' => $v1->price,
+            ]
+        );
+
+        OrderStatusLog::firstOrCreate(
+            ['order_id' => $o6->id, 'to_status' => OrderStatus::MenungguKonfirmasi->value],
+            [
+                'from_status' => null,
+                'note' => 'Pesanan berhasil dibuat oleh pelanggan via form checkout',
+                'created_at' => now()->subDays(5),
             ]
         );
 

@@ -41,8 +41,14 @@ enum ReturnStatus: string
         };
     }
 
+    public function badgeClass(): string
+    {
+        return $this->badgeClasses();
+    }
+
     public function isBlockingOrderCompletion(): bool
     {
         return ! in_array($this, [self::Ditolak, self::Selesai], true);
     }
 }
+

@@ -35,3 +35,4 @@ class ReturnShipment extends Model
         return $this->belongsTo(OrderReturn::class, 'return_id');
     }
 }
+

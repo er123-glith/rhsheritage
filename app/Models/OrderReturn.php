@@ -51,6 +51,11 @@ class OrderReturn extends Model
         return $this->belongsTo(User::class)->withTrashed();
     }
 
+    public function customer(): BelongsTo
+    {
+        return $this->user();
+    }
+
     public function items(): HasMany
     {
         return $this->hasMany(ReturnItem::class, 'return_id');
@@ -94,6 +99,31 @@ class OrderReturn extends Model
     public function replacementShipment(): ?ReturnShipment
     {
         return $this->shipments->firstWhere('type', 'replacement_from_admin');
+    }
+
+    public function adminReplacementShipment(): ?ReturnShipment
+    {
+        return $this->replacementShipment();
+    }
+
+    public function adminShipment(): ?ReturnShipment
+    {
+        return $this->replacementShipment();
+    }
+
+    public function getCustomerNameAttribute(): ?string
+    {
+        return $this->customer?->name ?? $this->order?->customer_name;
+    }
+
+    public function getCustomerPhoneAttribute(): ?string
+    {
+        return $this->customer?->phone ?? $this->order?->customer_phone;
+    }
+
+    public function getCustomerEmailAttribute(): ?string
+    {
+        return $this->customer?->email ?? $this->order?->customer_email;
     }
 
     public function reasonLabel(): string

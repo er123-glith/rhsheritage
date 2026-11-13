@@ -6,6 +6,13 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $title ?? 'Katalog Kriya Pilihan' }} - RHS HERITAGE</title>
 
+    <!-- Favicon RHS Heritage Resmi -->
+    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('favicon-16x16.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png') }}">
+    <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
+
     <!-- Google Fonts — Modern Apple / Inter & Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -22,7 +29,7 @@
     <!-- Top Announcement Bar -->
     <div class="bg-primary-900 text-gold-200 text-xs py-2 px-4 text-center font-medium border-b border-primary-800 hidden sm:block">
         <div class="max-w-7xl mx-auto flex items-center justify-between">
-            <p>Kriya Tradisi Keluarga Sejak 2004 — Menerima Pesanan Retail, Grosir & Kemitraan Sekolah</p>
+            <p>Kriya Tradisi Keluarga Sejak 2004 Menerima Pesanan Retail, Grosir & Kemitraan Sekolah</p>
             <div class="flex items-center gap-4">
                 <a href="{{ route('order.track') }}" class="text-primary-100 hover:text-white transition">Lacak Pesanan</a>
                 <span class="text-primary-700">|</span>
@@ -417,5 +424,8 @@
             </div>
         </div>
     </footer>
+
+    <!-- Floating WhatsApp Quick Support Button -->
+    <x-floating-whatsapp />
 </body>
 </html>

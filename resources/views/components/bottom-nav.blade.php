@@ -7,10 +7,8 @@
         class="flex flex-col items-center justify-center flex-1 h-12 rounded-xl transition-all {{ request()->routeIs('home') ? 'bg-primary-700 dark:bg-primary-600 text-white font-bold shadow-xs' : 'text-neutral-600 dark:text-neutral-400 hover:text-primary-700 dark:hover:text-gold-400' }}"
         aria-label="Beranda"
     >
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
-        </svg>
-        <span class="font-body text-[10px] font-semibold mt-0.5 leading-none">Beranda</span>
+        <i class="fa-solid fa-house text-base"></i>
+        <span class="font-body text-[10px] font-semibold mt-1 leading-none">Beranda</span>
     </a>
 
     <!-- Katalog -->
@@ -19,10 +17,8 @@
         class="flex flex-col items-center justify-center flex-1 h-12 rounded-xl transition-all {{ request()->routeIs('catalog.*') ? 'bg-primary-700 dark:bg-primary-600 text-white font-bold shadow-xs' : 'text-neutral-600 dark:text-neutral-400 hover:text-primary-700 dark:hover:text-gold-400' }}"
         aria-label="Katalog"
     >
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/>
-        </svg>
-        <span class="font-body text-[10px] font-semibold mt-0.5 leading-none">Katalog</span>
+        <i class="fa-solid fa-layer-group text-base"></i>
+        <span class="font-body text-[10px] font-semibold mt-1 leading-none">Katalog</span>
     </a>
 
     <!-- Keranjang Belanja -->
@@ -32,16 +28,14 @@
         aria-label="Keranjang"
     >
         <div class="relative">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
-            </svg>
+            <i class="fa-solid fa-cart-shopping text-base"></i>
             @if($cartCount > 0)
-                <span class="absolute -top-1.5 -right-2.5 min-w-[18px] h-[18px] px-1 rounded-full bg-danger text-white font-body text-[10px] font-bold flex items-center justify-center ring-2 ring-white dark:ring-neutral-900">
+                <span class="absolute -top-2 -right-3 min-w-[18px] h-[18px] px-1 rounded-full bg-danger text-white font-body text-[10px] font-bold flex items-center justify-center ring-2 ring-white dark:ring-neutral-900">
                     {{ $cartCount > 99 ? '99+' : $cartCount }}
                 </span>
             @endif
         </div>
-        <span class="font-body text-[10px] font-semibold mt-0.5 leading-none">Keranjang</span>
+        <span class="font-body text-[10px] font-semibold mt-1 leading-none">Keranjang</span>
     </a>
 
     {{-- Navigasi Dinamis Berdasarkan Status Login --}}
@@ -52,7 +46,7 @@
                 class="flex flex-col items-center justify-center flex-1 h-12 rounded-xl transition-all {{ request()->routeIs('admin.*') ? 'bg-primary-700 dark:bg-primary-600 text-white font-bold shadow-xs' : 'text-neutral-600 dark:text-neutral-400 hover:text-primary-700 dark:hover:text-gold-400' }}"
                 aria-label="Panel Admin"
             >
-                <span class="text-base leading-none">👑</span>
+                <i class="fa-solid fa-crown text-base text-gold-400"></i>
                 <span class="font-body text-[10px] font-semibold mt-1 leading-none">Admin</span>
             </a>
         @else
@@ -61,10 +55,8 @@
                 class="flex flex-col items-center justify-center flex-1 h-12 rounded-xl transition-all {{ request()->routeIs('customer.*') ? 'bg-primary-700 dark:bg-primary-600 text-white font-bold shadow-xs' : 'text-neutral-600 dark:text-neutral-400 hover:text-primary-700 dark:hover:text-gold-400' }}"
                 aria-label="Panel Akun"
             >
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                </svg>
-                <span class="font-body text-[10px] font-semibold mt-0.5 leading-none">Akun</span>
+                <i class="fa-solid fa-user text-base"></i>
+                <span class="font-body text-[10px] font-semibold mt-1 leading-none">Akun</span>
             </a>
         @endif
     @else
@@ -73,10 +65,8 @@
             class="flex flex-col items-center justify-center flex-1 h-12 rounded-xl transition-all {{ request()->routeIs('login') || request()->routeIs('register') ? 'bg-primary-700 dark:bg-primary-600 text-white font-bold shadow-xs' : 'text-neutral-600 dark:text-neutral-400 hover:text-primary-700 dark:hover:text-gold-400' }}"
             aria-label="Masuk"
         >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
-            </svg>
-            <span class="font-body text-[10px] font-semibold mt-0.5 leading-none">Masuk</span>
+            <i class="fa-solid fa-arrow-right-to-bracket text-base"></i>
+            <span class="font-body text-[10px] font-semibold mt-1 leading-none">Masuk</span>
         </a>
     @endauth
 
@@ -87,9 +77,7 @@
         class="flex flex-col items-center justify-center flex-1 h-12 rounded-xl text-neutral-600 dark:text-neutral-400 hover:text-primary-700 dark:hover:text-gold-400 transition-colors"
         aria-label="Buka Menu"
     >
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-        </svg>
-        <span class="font-body text-[10px] font-semibold mt-0.5 leading-none">Menu</span>
+        <i class="fa-solid fa-bars text-base"></i>
+        <span class="font-body text-[10px] font-semibold mt-1 leading-none">Menu</span>
     </button>
 </nav>

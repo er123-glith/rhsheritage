@@ -29,6 +29,7 @@ Route::get('/produk/{product:slug}', [ProductController::class, 'show'])->name('
 
 // Konfirmasi & Lacak Pesanan
 Route::get('/pesanan/{orderNumber}', [OrderController::class, 'confirmation'])->name('order.confirmation');
+Route::get('/pesanan/{orderNumber}/invoice', [OrderController::class, 'invoice'])->name('order.invoice');
 Route::get('/lacak-pesanan', [OrderController::class, 'trackForm'])->name('order.track');
 Route::post('/lacak-pesanan', [OrderController::class, 'track'])
     ->middleware('throttle:10,1')
@@ -75,6 +76,7 @@ Route::middleware('auth')->prefix('customer')->name('customer.')->group(function
     Route::get('/dashboard', [\App\Http\Controllers\Customer\DashboardController::class, 'index'])->name('dashboard');
     Route::get('/pesanan', [\App\Http\Controllers\Customer\OrderController::class, 'index'])->name('orders');
     Route::get('/pesanan/{orderNumber}', [\App\Http\Controllers\Customer\OrderController::class, 'show'])->name('orders.show');
+    Route::get('/pesanan/{orderNumber}/invoice', [\App\Http\Controllers\Customer\OrderController::class, 'invoice'])->name('orders.invoice');
     Route::post('/pesanan/{orderNumber}/konfirmasi-terima', [\App\Http\Controllers\Customer\OrderController::class, 'confirmDelivery'])->name('orders.confirm-delivery');
 
     // Manajemen Retur Customer (RMS)
@@ -85,6 +87,12 @@ Route::middleware('auth')->prefix('customer')->name('customer.')->group(function
     Route::post('/retur/{returnNumber}/kirim-resi', [\App\Http\Controllers\Customer\ReturnController::class, 'shipReturn'])->name('returns.ship');
     Route::post('/retur/{returnNumber}/konfirmasi-pengganti', [\App\Http\Controllers\Customer\ReturnController::class, 'confirmReplacement'])->name('returns.confirm-replacement');
     Route::post('/retur/{returnNumber}/konfirmasi-refund', [\App\Http\Controllers\Customer\ReturnController::class, 'confirmRefund'])->name('returns.confirm-refund');
+
+    // Ulasan Toko & Pengalaman Pelanggan
+    Route::get('/pesanan/{orderNumber}/ulasan', [\App\Http\Controllers\Customer\ReviewController::class, 'create'])->name('reviews.create');
+    Route::post('/pesanan/{orderNumber}/ulasan', [\App\Http\Controllers\Customer\ReviewController::class, 'store'])
+        ->middleware('throttle:10,1')
+        ->name('reviews.store');
 });
 
 // Endpoint unduh / lihat berkas bukti privat berotorisasi

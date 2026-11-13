@@ -36,4 +36,24 @@ return Application::configure(basePath: dirname(__DIR__))
         $exceptions->shouldRenderJsonWhen(
             fn (Request $request) => $request->is('api/*') || $request->expectsJson(),
         );
+
+        // Penanganan PostTooLargeException & HTTP 413 secara ramah pengguna (RHS Heritage)
+        $exceptions->render(function (\Illuminate\Http\Exceptions\PostTooLargeException $e, Request $request) {
+            $userMessage = 'Ukuran file terlalu besar. Silakan kompres atau pilih file yang lebih kecil, kemudian coba kembali.';
+
+            if ($request->expectsJson() || $request->is('api/*') || $request->ajax()) {
+                return response()->json([
+                    'message' => $userMessage,
+                    'error'   => 'post_too_large',
+                ], 413);
+            }
+
+            if ($request->hasSession()) {
+                return back()->withInput()->with('error', $userMessage);
+            }
+
+            return response()->view('errors.413', [
+                'message' => $userMessage,
+            ], 413);
+        });
     })->create();

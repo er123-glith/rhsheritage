@@ -401,7 +401,7 @@
 
                             <!-- Pengiriman Barang Pengganti dari Admin -->
                             @php
-                                $adminShip = $return->adminReplacementShipment();
+                                $adminShip = $return->adminReplacementShipment() ?? $return->replacementShipment();
                             @endphp
                             <div class="p-4 rounded-xl border border-neutral-200 bg-neutral-50/50 space-y-3">
                                 <div class="flex items-center justify-between border-b border-neutral-200 pb-2">
@@ -501,19 +501,21 @@
                     <div class="space-y-2 text-xs">
                         <div>
                             <span class="text-neutral-400 block">Nama Lengkap:</span>
-                            <span class="font-bold text-neutral-800">{{ $return->customer->name ?? $return->order->customer_name }}</span>
+                            <span class="font-bold text-neutral-800">{{ $return->customer?->name ?? $return->order?->customer_name ?? '-' }}</span>
                         </div>
                         <div>
                             <span class="text-neutral-400 block">No. WhatsApp / HP:</span>
-                            <span class="font-mono text-neutral-800">{{ $return->customer->phone ?? $return->order->customer_phone }}</span>
+                            <span class="font-mono text-neutral-800">{{ $return->customer?->phone ?? $return->order?->customer_phone ?? '-' }}</span>
                         </div>
                         <div>
                             <span class="text-neutral-400 block">Email:</span>
-                            <span class="text-neutral-700">{{ $return->customer->email ?? $return->order->customer_email }}</span>
+                            <span class="text-neutral-700">{{ $return->customer?->email ?? $return->order?->customer_email ?? '-' }}</span>
                         </div>
                         <div>
                             <span class="text-neutral-400 block">Alamat Kirim Asli:</span>
-                            <span class="text-neutral-700 leading-relaxed block">{{ $return->order->shipping_address }}, {{ $return->order->shipping_city }}</span>
+                            <span class="text-neutral-700 leading-relaxed block">
+                                {{ $return->order?->address_line ?? $return->order?->shipping_address ?? '-' }}{{ ($return->order?->city || $return->order?->shipping_city) ? ', ' . ($return->order?->city ?? $return->order?->shipping_city) : '' }}
+                            </span>
                         </div>
                     </div>
                 </div>

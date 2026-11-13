@@ -191,12 +191,25 @@
                                         <x-status-badge :status="$order->status" />
                                     </td>
                                     <td class="px-6 py-4 text-right">
-                                        <a href="{{ route('customer.orders.show', $order->order_number) }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-neutral-300 text-xs font-semibold text-neutral-700 hover:bg-neutral-50 hover:border-primary-600 transition shadow-xs">
-                                            <span>Rincian</span>
-                                            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                                            </svg>
-                                        </a>
+                                        <div class="flex items-center justify-end gap-2">
+                                            @if($order->status === \App\Enums\OrderStatus::Selesai)
+                                                @if($order->review)
+                                                    <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 text-[11px] font-semibold" title="Sudah Diulas">
+                                                        <i class="fa-solid fa-star text-gold-500 text-[10px]"></i>
+                                                        <span>{{ $order->review->rating }}★</span>
+                                                    </span>
+                                                @else
+                                                    <a href="{{ route('customer.reviews.create', $order->order_number) }}" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-gold-500 hover:bg-gold-400 text-neutral-900 text-xs font-bold transition shadow-xs">
+                                                        <i class="fa-solid fa-star text-[10px]"></i>
+                                                        <span>Beri Ulasan</span>
+                                                    </a>
+                                                @endif
+                                            @endif
+                                            <a href="{{ route('customer.orders.show', $order->order_number) }}" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-neutral-300 dark:border-neutral-700 text-xs font-semibold text-neutral-700 dark:text-neutral-200 hover:bg-neutral-50 dark:hover:bg-neutral-800 hover:border-primary-600 transition shadow-xs">
+                                                <span>Rincian</span>
+                                                <i class="fa-solid fa-chevron-right text-[10px]"></i>
+                                            </a>
+                                        </div>
                                     </td>
                                 </tr>
                             @endforeach

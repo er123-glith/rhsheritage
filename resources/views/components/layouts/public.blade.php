@@ -6,6 +6,13 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>{{ $title ?? 'Katalog Kriya Pilihan' }} - RHS HERITAGE</title>
 
+    <!-- Favicon RHS Heritage Resmi -->
+    <link rel="icon" type="image/svg+xml" href="{{ asset('favicon.svg') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ asset('favicon-32x32.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ asset('favicon-16x16.png') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('apple-touch-icon.png') }}">
+    <link rel="shortcut icon" href="{{ asset('favicon.ico') }}">
+
     <!-- Google Fonts — Modern Apple / Inter & Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -46,7 +53,7 @@
     <!-- Top Announcement Bar (Desktop) -->
     <div class="bg-primary-900 text-gold-200 text-xs py-2 px-4 text-center font-medium border-b border-primary-800 hidden sm:block">
         <div class="max-w-7xl mx-auto flex items-center justify-between">
-            <p>Kriya Tradisi Keluarga Sejak 2004 — Menerima Pesanan Retail, Grosir & Kemitraan Sekolah</p>
+            <p>Kriya Tradisi Keluarga Sejak 2004 Menerima Pesanan Retail, Grosir & Kemitraan Sekolah</p>
             <div class="flex items-center gap-4">
                 <a href="{{ route('order.track') }}" class="text-primary-100 hover:text-white transition">Lacak Pesanan</a>
                 <span class="text-primary-700">|</span>
@@ -59,8 +66,9 @@
                 @endguest
                 @auth
                     @if(auth()->user()->isAdmin())
-                        <a href="{{ route('admin.dashboard') }}" class="text-gold-300 hover:text-white transition font-bold flex items-center gap-1">
-                            <span>👑</span> Dashboard Admin
+                        <a href="{{ route('admin.dashboard') }}" class="text-gold-300 hover:text-white transition font-bold flex items-center gap-1.5">
+                            <i class="fa-solid fa-crown text-gold-400 text-xs"></i>
+                            <span>Dashboard Admin</span>
                         </a>
                     @else
                         <a href="{{ route('customer.dashboard') }}" class="text-gold-300 hover:text-white transition font-bold">Dashboard Pelanggan</a>
@@ -102,9 +110,7 @@
                 <form action="{{ route('catalog.index') }}" method="GET" class="hidden lg:flex flex-1 max-w-md mx-6">
                     <div class="relative w-full">
                         <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                            </svg>
+                            <i class="fa-solid fa-magnifying-glass text-xs"></i>
                         </div>
                         <input
                             type="search"
@@ -187,9 +193,7 @@
                         class="relative p-2 sm:p-2.5 rounded-full text-neutral-700 dark:text-neutral-300 hover:text-primary-700 dark:hover:text-gold-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition focus-visible:outline-primary-500"
                         aria-label="Lihat Keranjang Belanja"
                     >
-                        <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
-                        </svg>
+                        <i class="fa-solid fa-cart-shopping text-base sm:text-lg"></i>
                         @if($cartCount > 0)
                             <span class="absolute top-0 right-0 min-w-[18px] h-[18px] px-1 rounded-full bg-danger text-white font-body text-[10px] font-bold flex items-center justify-center ring-2 ring-white dark:ring-neutral-900">
                                 {{ $cartCount > 99 ? '99+' : $cartCount }}
@@ -204,9 +208,7 @@
                         class="md:hidden p-2 rounded-lg text-neutral-700 dark:text-neutral-300 hover:text-primary-700 dark:hover:text-gold-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 focus-visible:outline-primary-500"
                         aria-label="Buka Menu Navigasi"
                     >
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
-                        </svg>
+                        <i class="fa-solid fa-bars text-lg"></i>
                     </button>
                 </div>
             </div>
@@ -216,9 +218,7 @@
                 <form action="{{ route('catalog.index') }}" method="GET" class="w-full">
                     <div class="relative w-full">
                         <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-neutral-400">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
-                            </svg>
+                            <i class="fa-solid fa-magnifying-glass text-xs"></i>
                         </div>
                         <input
                             type="search"
@@ -270,9 +270,7 @@
                     class="p-1.5 rounded-lg text-white/80 hover:text-white hover:bg-white/10"
                     aria-label="Tutup Menu"
                 >
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                    </svg>
+                    <i class="fa-solid fa-xmark text-lg"></i>
                 </button>
             </div>
 
@@ -282,14 +280,14 @@
                     href="{{ route('home') }}"
                     class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-neutral-100 dark:hover:bg-neutral-800 transition {{ request()->routeIs('home') ? 'bg-primary-50 dark:bg-primary-900/50 text-primary-700 dark:text-gold-400' : 'text-neutral-700 dark:text-neutral-200' }}"
                 >
-                    <span class="text-base">🏠</span>
+                    <i class="fa-solid fa-house text-sm w-5 text-center text-primary-600 dark:text-gold-400"></i>
                     <span>Beranda</span>
                 </a>
                 <a
                     href="{{ route('catalog.index') }}"
                     class="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-neutral-100 dark:hover:bg-neutral-800 transition {{ request()->routeIs('catalog.*') ? 'bg-primary-50 dark:bg-primary-900/50 text-primary-700 dark:text-gold-400' : 'text-neutral-700 dark:text-neutral-200' }}"
                 >
-                    <span class="text-base">🛍️</span>
+                    <i class="fa-solid fa-layer-group text-sm w-5 text-center text-primary-600 dark:text-gold-400"></i>
                     <span>Semua Katalog Produk</span>
                 </a>
 
@@ -297,15 +295,15 @@
                     Kategori Kriya
                 </div>
                 <a href="{{ route('catalog.category', 'songkok') }}" class="flex items-center gap-3 px-3 py-2 rounded-xl text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 text-sm">
-                    <span>👑</span>
+                    <i class="fa-solid fa-crown text-sm w-5 text-center text-primary-700 dark:text-gold-400"></i>
                     <span>Songkok Nusantara</span>
                 </a>
                 <a href="{{ route('catalog.category', 'sarung') }}" class="flex items-center gap-3 px-3 py-2 rounded-xl text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 text-sm">
-                    <span>🧵</span>
+                    <i class="fa-solid fa-scroll text-sm w-5 text-center text-primary-700 dark:text-gold-400"></i>
                     <span>Sarung ATBM Tradisi</span>
                 </a>
                 <a href="{{ route('catalog.category', 'jilbab') }}" class="flex items-center gap-3 px-3 py-2 rounded-xl text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 text-sm">
-                    <span>🧕</span>
+                    <i class="fa-solid fa-award text-sm w-5 text-center text-primary-700 dark:text-gold-400"></i>
                     <span>Jilbab & Kerudung Sekolah</span>
                 </a>
 
@@ -316,15 +314,20 @@
                                 href="{{ route('admin.dashboard') }}"
                                 class="flex items-center justify-between px-3.5 py-3 rounded-xl bg-gold-100 dark:bg-gold-950/60 text-gold-900 dark:text-gold-300 border border-gold-300 font-bold transition shadow-sm"
                             >
-                                <span>👑 Panel Dashboard Admin</span>
-                                <span class="text-xs">&rarr;</span>
+                                <span class="flex items-center gap-2">
+                                    <i class="fa-solid fa-crown text-gold-700 dark:text-gold-400"></i>
+                                    <span>Panel Dashboard Admin</span>
+                                </span>
+                                <i class="fa-solid fa-arrow-right text-xs"></i>
                             </a>
                         @else
                             <a href="{{ route('customer.orders') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 {{ request()->routeIs('customer.orders') ? 'bg-primary-50 dark:bg-primary-900/50 text-primary-700 dark:text-gold-400 font-bold' : '' }}">
-                                <span>📦 Pesanan Saya</span>
+                                <i class="fa-solid fa-box text-sm w-5 text-center text-primary-600 dark:text-gold-400"></i>
+                                <span>Pesanan Saya</span>
                             </a>
                             <a href="{{ route('profile.edit') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 {{ request()->routeIs('profile.*') ? 'bg-primary-50 dark:bg-primary-900/50 text-primary-700 dark:text-gold-400 font-bold' : '' }}">
-                                <span>👤 Profil Saya</span>
+                                <i class="fa-solid fa-user text-sm w-5 text-center text-primary-600 dark:text-gold-400"></i>
+                                <span>Profil Saya</span>
                             </a>
                         @endif
                     @endauth
@@ -333,12 +336,16 @@
                         href="{{ route('partnership.index') }}"
                         class="flex items-center justify-between px-3.5 py-3 rounded-xl bg-gold-50 dark:bg-neutral-800 text-gold-900 dark:text-gold-300 border border-gold-300/60 font-bold transition shadow-sm"
                     >
-                        <span>📦 Harga Grosir & Mitra</span>
-                        <span class="text-xs">&rarr;</span>
+                        <span class="flex items-center gap-2">
+                            <i class="fa-solid fa-boxes-stacked text-gold-700 dark:text-gold-400"></i>
+                            <span>Harga Grosir & Mitra</span>
+                        </span>
+                        <i class="fa-solid fa-arrow-right text-xs"></i>
                     </a>
 
                     <a href="{{ route('order.track') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800">
-                        <span>🔍 Lacak Status Pesanan</span>
+                        <i class="fa-solid fa-magnifying-glass-location text-sm w-5 text-center text-primary-600 dark:text-gold-400"></i>
+                        <span>Lacak Status Pesanan</span>
                     </a>
 
                     <!-- Theme Toggle in Mobile Drawer -->
@@ -347,7 +354,8 @@
                     </div>
 
                     <a href="{{ route('about') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800">
-                        <span>🏛️ Tentang RHS HERITAGE</span>
+                        <i class="fa-solid fa-landmark text-sm w-5 text-center text-primary-600 dark:text-gold-400"></i>
+                        <span>Tentang RHS HERITAGE</span>
                     </a>
                 </div>
             </nav>
@@ -498,6 +506,9 @@
             </div>
         </div>
     </footer>
+
+    <!-- Floating WhatsApp Quick Support Button -->
+    <x-floating-whatsapp />
 
     <!-- Mobile Floating Bottom Navigation Bar -->
     <x-bottom-nav :cart-count="$cartCount" />

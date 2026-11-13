@@ -15,9 +15,11 @@ use App\Models\ReturnItem;
 use App\Models\ReturnRefund;
 use App\Models\ReturnShipment;
 use App\Models\ReturnStatusHistory;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
@@ -35,7 +37,17 @@ class ReturnController extends Controller
             ->latest('id');
 
         if ($status = $request->input('status')) {
-            $query->where('status', $status);
+            if ($status === 'dalam_penyelesaian') {
+                $query->whereIn('status', [
+                    ReturnStatus::Disetujui,
+                    ReturnStatus::MenungguBarangBalik,
+                    ReturnStatus::BarangDiperiksa,
+                    ReturnStatus::DalamPenyelesaian,
+                    ReturnStatus::PerluInformasi,
+                ]);
+            } else {
+                $query->where('status', $status);
+            }
         }
 
         $returns = $query->paginate(10)->withQueryString();
@@ -81,105 +93,136 @@ class ReturnController extends Controller
     }
 
     /**
-     * Menyimpan formulir pengajuan retur baru.
+     * Menyimpan formulir pengajuan retur baru (mendukung pengiriman standar & AJAX progress).
      */
-    public function store(StoreReturnRequest $request): RedirectResponse
+    public function store(StoreReturnRequest $request): RedirectResponse|JsonResponse
     {
         $user = $request->user();
         $order = Order::findOrFail($request->input('order_id'));
+        $storedFiles = [];
 
-        return DB::transaction(function () use ($request, $user, $order) {
-            $returnNumber = 'RET-' . date('Ymd') . '-' . strtoupper(Str::random(6));
+        try {
+            $orderReturn = DB::transaction(function () use ($request, $user, $order, &$storedFiles) {
+                $returnNumber = 'RET-' . date('Ymd') . '-' . strtoupper(Str::random(6));
 
-            $orderReturn = OrderReturn::create([
-                'return_number' => $returnNumber,
-                'order_id'      => $order->id,
-                'user_id'       => $user->id,
-                'solution'      => $request->input('solution'),
-                'reason'        => $request->input('reason'),
-                'description'   => $request->input('description'),
-                'status'        => ReturnStatus::MenungguReview,
-                'agreed_terms'  => true,
-            ]);
+                $orderReturn = OrderReturn::create([
+                    'return_number' => $returnNumber,
+                    'order_id'      => $order->id,
+                    'user_id'       => $user->id,
+                    'solution'      => $request->input('solution'),
+                    'reason'        => $request->input('reason'),
+                    'description'   => $request->input('description'),
+                    'status'        => ReturnStatus::MenungguReview,
+                    'agreed_terms'  => true,
+                ]);
 
-            // Simpan rincian item produk yang diretur
-            $items = $request->input('items', []);
-            $totalRefundEstimate = 0;
+                // Simpan rincian item produk yang diretur
+                $items = $request->input('items', []);
+                $totalRefundEstimate = 0;
 
-            foreach ($items as $itemData) {
-                if (empty($itemData['id']) || empty($itemData['qty'])) {
-                    continue;
+                foreach ($items as $itemData) {
+                    if (empty($itemData['id']) || empty($itemData['qty'])) {
+                        continue;
+                    }
+
+                    $orderItem = OrderItem::findOrFail($itemData['id']);
+                    $qty = (int) $itemData['qty'];
+                    $subtotal = $orderItem->unit_price * $qty;
+                    $totalRefundEstimate += $subtotal;
+
+                    ReturnItem::create([
+                        'return_id'          => $orderReturn->id,
+                        'order_item_id'      => $orderItem->id,
+                        'product_variant_id' => $orderItem->product_variant_id,
+                        'quantity'           => $qty,
+                        'unit_price'         => $orderItem->unit_price,
+                        'subtotal'           => $subtotal,
+                    ]);
                 }
 
-                $orderItem = OrderItem::findOrFail($itemData['id']);
-                $qty = (int) $itemData['qty'];
-                $subtotal = $orderItem->unit_price * $qty;
-                $totalRefundEstimate += $subtotal;
-
-                ReturnItem::create([
-                    'return_id'          => $orderReturn->id,
-                    'order_item_id'      => $orderItem->id,
-                    'product_variant_id' => $orderItem->product_variant_id,
-                    'quantity'           => $qty,
-                    'unit_price'         => $orderItem->unit_price,
-                    'subtotal'           => $subtotal,
-                ]);
-            }
-
-            // Simpan Video Unboxing Wajib
-            if ($request->hasFile('unboxing_video')) {
-                $video = $request->file('unboxing_video');
-                $videoPath = $video->store('secure_proofs/returns/videos', 'local');
-
-                ReturnEvidence::create([
-                    'return_id'     => $orderReturn->id,
-                    'file_type'     => 'unboxing_video',
-                    'file_path'     => $videoPath,
-                    'original_name' => $video->getClientOriginalName(),
-                    'file_size'     => $video->getSize(),
-                    'mime_type'     => $video->getMimeType(),
-                ]);
-            }
-
-            // Simpan Foto Bukti Fisik Wajib
-            if ($request->hasFile('photos')) {
-                foreach ($request->file('photos') as $photo) {
-                    $photoPath = $photo->store('secure_proofs/returns/photos', 'local');
+                // Simpan Video Unboxing Wajib
+                if ($request->hasFile('unboxing_video')) {
+                    $video = $request->file('unboxing_video');
+                    $videoPath = $video->store('secure_proofs/returns/videos', 'local');
+                    $storedFiles[] = $videoPath;
 
                     ReturnEvidence::create([
                         'return_id'     => $orderReturn->id,
-                        'file_type'     => 'photo',
-                        'file_path'     => $photoPath,
-                        'original_name' => $photo->getClientOriginalName(),
-                        'file_size'     => $photo->getSize(),
-                        'mime_type'     => $photo->getMimeType(),
+                        'file_type'     => 'unboxing_video',
+                        'file_path'     => $videoPath,
+                        'original_name' => $video->getClientOriginalName(),
+                        'file_size'     => $video->getSize(),
+                        'mime_type'     => $video->getMimeType(),
                     ]);
                 }
-            }
 
-            // Jika solusi adalah refund, buat entri awal return_refunds
-            if ($orderReturn->solution === 'refund') {
-                ReturnRefund::create([
-                    'return_id' => $orderReturn->id,
-                    'amount'    => $totalRefundEstimate,
-                    'status'    => RefundStatus::BelumDiproses,
+                // Simpan Foto Bukti Fisik Wajib
+                if ($request->hasFile('photos')) {
+                    foreach ($request->file('photos') as $photo) {
+                        $photoPath = $photo->store('secure_proofs/returns/photos', 'local');
+                        $storedFiles[] = $photoPath;
+
+                        ReturnEvidence::create([
+                            'return_id'     => $orderReturn->id,
+                            'file_type'     => 'photo',
+                            'file_path'     => $photoPath,
+                            'original_name' => $photo->getClientOriginalName(),
+                            'file_size'     => $photo->getSize(),
+                            'mime_type'     => $photo->getMimeType(),
+                        ]);
+                    }
+                }
+
+                // Jika solusi adalah refund, buat entri awal return_refunds
+                if ($orderReturn->solution === 'refund') {
+                    ReturnRefund::create([
+                        'return_id' => $orderReturn->id,
+                        'amount'    => $totalRefundEstimate,
+                        'status'    => RefundStatus::BelumDiproses,
+                    ]);
+                }
+
+                // Catat log histori status
+                ReturnStatusHistory::create([
+                    'return_id'   => $orderReturn->id,
+                    'from_status' => null,
+                    'to_status'   => ReturnStatus::MenungguReview->value,
+                    'actor_type'  => 'customer',
+                    'actor_id'    => $user->id,
+                    'note'        => 'Pengajuan retur diajukan oleh pelanggan lengkap dengan video unboxing dan foto bukti.',
+                    'created_at'  => now(),
+                ]);
+
+                return $orderReturn;
+            });
+
+            $successMsg = "Pengajuan retur #{$orderReturn->return_number} berhasil dikirim dan sedang menunggu peninjauan oleh tim RHS Heritage.";
+
+            if ($request->expectsJson() || $request->ajax()) {
+                session()->flash('status', $successMsg);
+                session()->flash('success', $successMsg);
+                return response()->json([
+                    'success'       => true,
+                    'message'       => $successMsg,
+                    'return_number' => $orderReturn->return_number,
+                    'redirect'      => route('customer.returns.show', $orderReturn->return_number),
                 ]);
             }
 
-            // Catat log histori status
-            ReturnStatusHistory::create([
-                'return_id'   => $orderReturn->id,
-                'from_status' => null,
-                'to_status'   => ReturnStatus::MenungguReview->value,
-                'actor_type'  => 'customer',
-                'actor_id'    => $user->id,
-                'note'        => 'Pengajuan retur diajukan oleh pelanggan lengkap dengan video unboxing dan foto bukti.',
-                'created_at'  => now(),
-            ]);
-
             return redirect()->route('customer.returns.show', $orderReturn->return_number)
-                ->with('status', "Pengajuan retur #{$orderReturn->return_number} berhasil dikirim dan sedang menunggu peninjauan oleh tim RHS Heritage.");
-        });
+                ->with('status', $successMsg)
+                ->with('success', $successMsg);
+        } catch (\Throwable $e) {
+            // Mekanisme pemulihan jika terjadi kegagalan (bersihkan berkas yang sudah sempat tersimpan)
+            foreach ($storedFiles as $filePath) {
+                try {
+                    Storage::disk('local')->delete($filePath);
+                } catch (\Throwable $cleanupEx) {
+                    // Abaikan kegagalan cleanup spesifik
+                }
+            }
+            throw $e;
+        }
     }
 
     /**
@@ -362,3 +405,4 @@ class ReturnController extends Controller
         return back()->with('status', 'Terima kasih! Pengembalian dana telah selesai.');
     }
 }
+

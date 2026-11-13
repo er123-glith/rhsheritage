@@ -33,6 +33,9 @@ class StoreReturnRequest extends FormRequest
      */
     public function rules(): array
     {
+        $maxVideoKb = config('uploads.unboxing_video.max_kb', 102400);
+        $maxPhotoKb = config('uploads.return_photo.max_kb', 5120);
+
         return [
             'order_id'       => ['required', 'exists:orders,id'],
             'solution'       => ['required', 'in:replacement,refund'],
@@ -45,14 +48,14 @@ class StoreReturnRequest extends FormRequest
                 'required',
                 'file',
                 'mimetypes:video/mp4,video/quicktime,video/webm',
-                'max:102400', // 100 MB
+                'max:' . $maxVideoKb,
             ],
             'photos'         => ['required', 'array', 'min:1'],
             'photos.*'       => [
                 'required',
                 'file',
                 'mimes:jpg,jpeg,png,webp',
-                'max:5120', // 5 MB
+                'max:' . $maxPhotoKb,
             ],
             'agreement'      => ['accepted'],
         ];
@@ -94,8 +97,20 @@ class StoreReturnRequest extends FormRequest
     public function withValidator($validator): void
     {
         $validator->after(function ($validator) {
-            $items = $this->input('items', []);
             $orderId = $this->input('order_id');
+            $order = Order::find($orderId);
+
+            if ($order) {
+                if (! in_array($order->status, [\App\Enums\OrderStatus::Dikirim, \App\Enums\OrderStatus::Selesai], true)) {
+                    $validator->errors()->add('order_id', 'Pengajuan retur hanya dapat dilakukan setelah barang dikirim atau diterima secara fisik.');
+                }
+
+                if ($order->hasActiveReturn()) {
+                    $validator->errors()->add('order_id', 'Pesanan ini sudah memiliki pengajuan retur aktif yang sedang diproses.');
+                }
+            }
+
+            $items = $this->input('items', []);
 
             foreach ($items as $itemData) {
                 if (empty($itemData['id']) || empty($itemData['qty'])) {
@@ -119,3 +134,4 @@ class StoreReturnRequest extends FormRequest
         });
     }
 }
+

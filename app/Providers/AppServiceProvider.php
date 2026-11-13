@@ -23,6 +23,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Pastikan zona waktu PHP dan Carbon terkonfigurasi ke Asia/Jakarta
+        date_default_timezone_set(config('app.timezone', 'Asia/Jakarta'));
+        \Carbon\Carbon::setLocale(config('app.locale', 'id'));
+
         // Deteksi N+1 query di lingkungan lokal
         Model::preventLazyLoading(app()->isLocal());
 

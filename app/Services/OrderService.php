@@ -162,6 +162,7 @@ class OrderService
                 'from_status' => null,
                 'to_status'   => OrderStatus::MenungguKonfirmasi->value,
                 'note'        => 'Pesanan diterima dari sistem.',
+                'created_at'  => $order->created_at ?? now(),
             ]);
 
             // Reload relasi untuk membangun payload JSON

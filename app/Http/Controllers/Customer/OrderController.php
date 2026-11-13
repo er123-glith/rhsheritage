@@ -27,7 +27,7 @@ class OrderController extends Controller
         $completedCount = Order::where('user_id', $userId)->where('status', OrderStatus::Selesai)->count();
         $cancelledCount = Order::where('user_id', $userId)->where('status', OrderStatus::Dibatalkan)->count();
 
-        $query = Order::with(['orderItems', 'shippingZone'])
+        $query = Order::with(['orderItems', 'shippingZone', 'review'])
             ->where('user_id', $userId)
             ->latest();
 
@@ -60,7 +60,7 @@ class OrderController extends Controller
      */
     public function show(string $orderNumber, WhatsAppLinkGenerator $wa): View
     {
-        $order = Order::with(['orderItems.variant.product.primaryImage', 'shippingZone', 'statusLogs'])
+        $order = Order::with(['orderItems.variant.product.primaryImage', 'shippingZone', 'statusLogs', 'review', 'returns', 'deliveryConfirmedBy'])
             ->where('order_number', $orderNumber)
             ->firstOrFail();
 
@@ -72,6 +72,23 @@ class OrderController extends Controller
         $whatsappUrl = $wa->forOrder($order);
 
         return view('customer.orders.show', compact('order', 'whatsappUrl'));
+    }
+
+    /**
+     * Tampilkan dokumen invoice resmi pesanan customer berstandar A4 siap cetak dan ekspor ke PDF.
+     */
+    public function invoice(string $orderNumber): View
+    {
+        $order = Order::with(['orderItems', 'shippingZone', 'user', 'deliveryConfirmedBy'])
+            ->where('order_number', $orderNumber)
+            ->firstOrFail();
+
+        // Otorisasi: Customer hanya boleh melihat invoice pesanannya sendiri.
+        if ($order->user_id !== auth()->id() && ! auth()->user()->isAdmin()) {
+            abort(403, 'Akses ditolak. Anda tidak memiliki izin untuk melihat invoice pesanan ini.');
+        }
+
+        return view('invoices.order-invoice', compact('order'));
     }
 
     /**
@@ -96,15 +113,16 @@ class OrderController extends Controller
             return back()->with('error', 'Pesanan memiliki pengajuan retur aktif. Konfirmasi selesai tidak dapat dilakukan hingga retur terselesaikan.');
         }
 
+        $maxKb = config('uploads.delivery_proof.max_kb', 5120);
+        $mimesRule = config('uploads.delivery_proof.mimes_rule', 'mimes:jpg,jpeg,png,webp');
+        $uploadErrors = config('uploads.delivery_proof.error_messages', []);
+
         $validated = $request->validate([
             'agreement'      => ['accepted'],
-            'delivery_proof' => ['required', 'file', 'mimes:jpg,jpeg,png,webp', 'max:5120'], // Max 5MB
-        ], [
-            'agreement.accepted'      => 'Anda wajib menyetujui pernyataan bahwa barang pesanan telah diterima dengan baik.',
-            'delivery_proof.required' => 'Foto bukti penerimaan barang wajib diunggah.',
-            'delivery_proof.mimes'    => 'Foto bukti penerimaan harus berformat JPG, JPEG, PNG, atau WEBP.',
-            'delivery_proof.max'      => 'Ukuran foto bukti penerimaan maksimal 5 MB.',
-        ]);
+            'delivery_proof' => ['required', 'file', $mimesRule, 'max:' . $maxKb],
+        ], array_merge([
+            'agreement.accepted' => 'Anda wajib menyetujui pernyataan bahwa barang pesanan telah diterima dengan baik.',
+        ], $uploadErrors));
 
         $proofPath = $request->file('delivery_proof')->store('secure_proofs/delivery', 'local');
 

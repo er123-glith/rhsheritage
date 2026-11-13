@@ -31,4 +31,10 @@ enum RefundStatus: string
             self::Gagal              => 'bg-rose-100 text-rose-800 border-rose-200',
         };
     }
+
+    public function badgeClass(): string
+    {
+        return $this->badgeClasses();
+    }
 }
+

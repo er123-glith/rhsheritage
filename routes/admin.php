@@ -73,6 +73,7 @@ Route::prefix('admin')->group(function () {
         // Pesanan Masuk
         Route::get('/pesanan', [OrderController::class, 'index'])->name('admin.orders.index');
         Route::get('/pesanan/{order}', [OrderController::class, 'show'])->name('admin.orders.show');
+        Route::get('/pesanan/{order}/invoice', [OrderController::class, 'invoice'])->name('admin.orders.invoice');
         Route::post('/pesanan/{order}/konfirmasi', [OrderController::class, 'confirm'])->name('admin.orders.confirm');
         Route::post('/pesanan/{order}/batal', [OrderController::class, 'cancel'])->name('admin.orders.cancel');
         Route::post('/pesanan/{order}/status', [OrderController::class, 'updateStatus'])->name('admin.orders.status');
@@ -85,6 +86,12 @@ Route::prefix('admin')->group(function () {
         Route::post('/retur/{returnNumber}/verifikasi-barang', [ReturnController::class, 'verifyReceived'])->name('admin.returns.verify-received');
         Route::post('/retur/{returnNumber}/proses-replacement', [ReturnController::class, 'processReplacement'])->name('admin.returns.process-replacement');
         Route::post('/retur/{returnNumber}/proses-refund', [ReturnController::class, 'processRefund'])->name('admin.returns.process-refund');
+
+        // Manajemen Ulasan Pelanggan
+        Route::get('/ulasan', [\App\Http\Controllers\Admin\ReviewController::class, 'index'])->name('admin.reviews.index');
+        Route::post('/ulasan/{review}/approve', [\App\Http\Controllers\Admin\ReviewController::class, 'approve'])->name('admin.reviews.approve');
+        Route::post('/ulasan/{review}/reject', [\App\Http\Controllers\Admin\ReviewController::class, 'reject'])->name('admin.reviews.reject');
+        Route::post('/ulasan/{review}/hide', [\App\Http\Controllers\Admin\ReviewController::class, 'hide'])->name('admin.reviews.hide');
 
         // Manajemen Pelanggan (Customer)
         Route::get('/pelanggan', [CustomerController::class, 'index'])->name('admin.customers.index');
@@ -106,5 +113,9 @@ Route::prefix('admin')->group(function () {
             ->names('admin.shipping')
             ->except(['show']);
         Route::patch('/ongkir/{shipping_zone}/toggle-active', [ShippingZoneController::class, 'toggleActive'])->name('admin.shipping.toggle-active');
+
+        // Pengaturan Profil & Identitas Toko Admin
+        Route::get('/profil', [\App\Http\Controllers\ProfileController::class, 'edit'])->name('admin.profile.edit');
+        Route::get('/profile', fn () => redirect()->route('admin.profile.edit'));
     });
 });

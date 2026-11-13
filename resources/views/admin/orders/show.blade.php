@@ -17,16 +17,13 @@
             </nav>
 
             <div class="flex items-center gap-2">
-                <button 
-                    onclick="window.print()" 
-                    type="button" 
-                    class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-neutral-300 bg-white text-neutral-700 font-body text-xs font-semibold hover:bg-neutral-50 transition shadow-xs"
+                <a 
+                    href="{{ route('admin.orders.invoice', $order) }}" 
+                    target="_blank"
+                    class="inline-flex items-center px-3.5 py-1.5 rounded-lg border border-neutral-300 bg-white text-neutral-800 font-body text-xs font-semibold hover:bg-neutral-50 hover:border-primary-600 transition shadow-xs"
                 >
-                    <svg class="w-4 h-4 text-neutral-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                    </svg>
-                    <span>Cetak Invoice / Label</span>
-                </button>
+                    <span>Cetak Invoice Resmi (PDF)</span>
+                </a>
             </div>
         </div>
 
@@ -216,35 +213,8 @@
                     </div>
                 </div>
 
-                <!-- Order Status Timeline Log -->
-                <div class="bg-white rounded-xl border border-neutral-200 shadow-1 p-6">
-                    <h2 class="font-display text-base font-bold text-primary-700 mb-4">Riwayat Status & Log Transaksi</h2>
-                    
-                    <div class="relative pl-6 border-l-2 border-primary-200 space-y-6">
-                        @forelse($order->statusLogs as $log)
-                            <div class="relative group">
-                                <span class="absolute -left-[31px] top-1 w-4 h-4 rounded-full bg-primary-700 border-2 border-white ring-4 ring-primary-100"></span>
-                                <div>
-                                    <div class="flex items-center gap-2">
-                                        <span class="font-body text-xs font-bold text-primary-800 uppercase tracking-wider">
-                                            {{ \App\Enums\OrderStatus::tryFrom($log->to_status)?->label() ?? $log->to_status }}
-                                        </span>
-                                        <span class="text-xs text-neutral-400 font-body">
-                                            {{ $log->created_at ? $log->created_at->translatedFormat('d M Y - H:i:s') : '-' }} WIB
-                                        </span>
-                                    </div>
-                                    @if($log->note)
-                                        <p class="font-body text-xs text-neutral-600 mt-1 bg-canvas-sunken p-2.5 rounded-lg border border-neutral-200/60">
-                                            {{ $log->note }}
-                                        </p>
-                                    @endif
-                                </div>
-                            </div>
-                        @empty
-                            <p class="text-xs text-neutral-400">Belum ada riwayat status tercatat.</p>
-                        @endforelse
-                    </div>
-                </div>
+                <!-- Order Status Timeline & Activity Log -->
+                <x-order.progress-timeline :order="$order" context="admin" />
             </div>
 
             <!-- Right Column: Customer Info & Shipping (1 col) -->
@@ -508,6 +478,49 @@
         <div 
             x-show="shipModalOpen" 
             x-cloak
+            x-data="{
+                fileName: '',
+                fileSizeFormatted: '',
+                fileError: '',
+                isOverLimit: false,
+                maxBytes: {{ config('uploads.shipping_proof.max_bytes', 2097152) }},
+                maxMb: {{ config('uploads.shipping_proof.max_mb', 2) }},
+                handleFileSelect(e) {
+                    const file = e.target.files[0];
+                    if (!file) {
+                        this.resetFile();
+                        return;
+                    }
+                    this.fileName = file.name;
+                    const sizeKb = file.size / 1024;
+                    this.fileSizeFormatted = sizeKb < 1024
+                        ? sizeKb.toFixed(1) + ' KB'
+                        : (sizeKb / 1024).toFixed(2) + ' MB';
+
+                    if (file.size > this.maxBytes) {
+                        this.isOverLimit = true;
+                        this.fileError = 'Ukuran file (' + this.fileSizeFormatted + ') melebihi batas maksimal ' + this.maxMb + ' MB. Silakan pilih foto lain atau kompres file terlebih dahulu.';
+                    } else {
+                        this.isOverLimit = false;
+                        this.fileError = '';
+                    }
+                },
+                resetFile() {
+                    this.fileName = '';
+                    this.fileSizeFormatted = '';
+                    this.fileError = '';
+                    this.isOverLimit = false;
+                    if (this.$refs.shippingProofInput) {
+                        this.$refs.shippingProofInput.value = '';
+                    }
+                },
+                handleSubmit(e) {
+                    if (this.isOverLimit) {
+                        e.preventDefault();
+                        return false;
+                    }
+                }
+            }"
             class="fixed inset-0 z-50 overflow-y-auto bg-neutral-900/60 backdrop-blur-xs flex items-center justify-center p-4"
         >
             <div 
@@ -519,7 +532,7 @@
                     <button @click="shipModalOpen = false" class="text-neutral-400 hover:text-neutral-600">✕</button>
                 </div>
 
-                <form method="POST" action="{{ route('admin.orders.ship', $order) }}" enctype="multipart/form-data" class="mt-4 space-y-4 font-body">
+                <form method="POST" action="{{ route('admin.orders.ship', $order) }}" enctype="multipart/form-data" @submit="handleSubmit($event)" class="mt-4 space-y-4 font-body">
                     @csrf
 
                     <div class="p-3 bg-red-50 border border-red-200 rounded-lg flex items-center justify-between">
@@ -560,15 +573,45 @@
                     <div>
                         <label class="block text-xs font-semibold text-neutral-700 mb-1">
                             Foto Bukti Resi Fisik <span class="text-danger">*</span>
-                            <span class="text-neutral-400 font-normal ml-1">(JPG, PNG, WEBP maks 2 MB)</span>
+                            <span class="text-neutral-400 font-normal ml-1">(JPG, PNG, WEBP maks {{ config('uploads.shipping_proof.max_mb', 2) }} MB)</span>
                         </label>
                         <input
+                            x-ref="shippingProofInput"
+                            @change="handleFileSelect($event)"
                             type="file"
                             name="shipping_proof"
                             required
-                            accept="image/jpeg,image/png,image/webp"
+                            accept="{{ config('uploads.shipping_proof.accept', 'image/jpeg,image/png,image/webp') }}"
                             class="w-full text-xs text-neutral-600 file:mr-3 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100 cursor-pointer"
                         />
+
+                        <!-- File Info & Error Preview -->
+                        <template x-if="fileName">
+                            <div class="mt-2 p-2.5 rounded-lg border text-xs flex items-center justify-between"
+                                :class="isOverLimit ? 'bg-red-50 border-red-200 text-red-700' : 'bg-primary-50 border-primary-200 text-primary-800'">
+                                <div class="flex items-center gap-2 truncate pr-2">
+                                    <span x-text="isOverLimit ? '⚠️' : '✓'" class="font-bold"></span>
+                                    <span class="font-medium truncate" x-text="fileName"></span>
+                                    <span class="text-2xs opacity-75 whitespace-nowrap" x-text="'(' + fileSizeFormatted + ')'"></span>
+                                </div>
+                                <button 
+                                    type="button" 
+                                    @click="resetFile()" 
+                                    class="text-xs font-semibold hover:underline shrink-0"
+                                    :class="isOverLimit ? 'text-red-700' : 'text-primary-700'"
+                                >
+                                    Ganti
+                                </button>
+                            </div>
+                        </template>
+
+                        <!-- Inline Error Message -->
+                        <template x-if="fileError">
+                            <p class="mt-1.5 text-xs text-danger font-medium flex items-center gap-1" x-text="fileError"></p>
+                        </template>
+                        @error('shipping_proof')
+                            <p class="mt-1 text-xs text-danger font-medium">{{ $message }}</p>
+                        @enderror
                     </div>
 
                     <div>
@@ -593,7 +636,9 @@
                         </button>
                         <button 
                             type="submit" 
-                            class="px-5 py-2 rounded-lg text-xs font-bold bg-primary-700 hover:bg-primary-800 text-white shadow-xs"
+                            :disabled="isOverLimit"
+                            :class="isOverLimit ? 'opacity-50 cursor-not-allowed bg-neutral-400' : 'bg-primary-700 hover:bg-primary-800'"
+                            class="px-5 py-2 rounded-lg text-xs font-bold text-white shadow-xs transition"
                         >
                             Simpan & Kirim Pesanan
                         </button>

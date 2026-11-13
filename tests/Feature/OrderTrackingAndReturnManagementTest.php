@@ -919,4 +919,160 @@ class OrderTrackingAndReturnManagementTest extends TestCase
         // Pastikan tidak membocorkan bukti foto privat atau alamat lengkap sensitif
         $response->assertDontSee($order->address_line);
     }
+
+    /**
+     * 12. Regresi: Fix label() on string dan Status Logs
+     */
+    public function test_customer_can_view_order_details_with_status_logs_without_label_error(): void
+    {
+        $order = $this->createOrderForCustomer($this->customerA, OrderStatus::Diproses);
+
+        // Tambahkan status logs dalam bentuk enum maupun string langsung
+        $order->statusLogs()->create([
+            'from_status' => OrderStatus::MenungguKonfirmasi->value,
+            'to_status'   => OrderStatus::Diproses->value,
+            'note'        => 'Pembayaran telah diverifikasi oleh admin.',
+            'created_at'  => now()->subHour(),
+        ]);
+
+        $order->statusLogs()->create([
+            'from_status' => 'diproses',
+            'to_status'   => 'dikirim',
+            'note'        => 'Paket telah diserahkan ke J&T Express.',
+            'created_at'  => now(),
+        ]);
+
+        $response = $this->actingAs($this->customerA)->get(route('customer.orders.show', $order->order_number));
+        $response->assertStatus(200);
+        $response->assertSee($order->order_number);
+        $response->assertSee('Diproses');
+        $response->assertSee('Dikirim');
+        $response->assertSee('Pembayaran telah diverifikasi oleh admin.');
+    }
+
+    public function test_order_status_log_and_order_status_helpers(): void
+    {
+        $this->assertEquals('Menunggu Konfirmasi', OrderStatus::labelFor(OrderStatus::MenungguKonfirmasi));
+        $this->assertEquals('Diproses', OrderStatus::labelFor('diproses'));
+        $this->assertEquals('custom_status', OrderStatus::labelFor('custom_status'));
+        $this->assertEquals('-', OrderStatus::labelFor(null));
+
+        $this->assertNotEmpty(OrderStatus::Diproses->badgeClass());
+
+        $log = new \App\Models\OrderStatusLog([
+            'to_status' => 'dikirim',
+        ]);
+        $this->assertEquals('Dikirim', $log->status_label);
+        $this->assertEquals(OrderStatus::Dikirim, $log->status);
+    }
+
+    /**
+     * 13. Regresi: Upload Resi File Validation & Centralized Limits
+     */
+    public function test_admin_ship_order_rejects_file_larger_than_2mb(): void
+    {
+        $order = $this->createOrderForCustomer($this->customerA, OrderStatus::Diproses);
+
+        // File 2.5 MB (melebihi batas 2048 KB)
+        $oversizedFile = UploadedFile::fake()->create('resi_besar.jpg', 2560, 'image/jpeg');
+
+        $response = $this->actingAs($this->admin)->post(route('admin.orders.ship', $order), [
+            'tracking_number' => 'JT1234567890',
+            'shipping_date'   => '2026-11-14',
+            'shipping_proof'  => $oversizedFile,
+        ]);
+
+        $response->assertSessionHasErrors('shipping_proof');
+
+        $order->refresh();
+        $this->assertEquals(OrderStatus::Diproses, $order->status);
+        $this->assertNull($order->shipping_proof_path);
+    }
+
+    public function test_admin_ship_order_rejects_disallowed_mime_type(): void
+    {
+        $order = $this->createOrderForCustomer($this->customerA, OrderStatus::Diproses);
+
+        $pdfFile = UploadedFile::fake()->create('dokumen.pdf', 500, 'application/pdf');
+
+        $response = $this->actingAs($this->admin)->post(route('admin.orders.ship', $order), [
+            'tracking_number' => 'JT1234567890',
+            'shipping_date'   => '2026-11-14',
+            'shipping_proof'  => $pdfFile,
+        ]);
+
+        $response->assertSessionHasErrors('shipping_proof');
+        $order->refresh();
+        $this->assertEquals(OrderStatus::Diproses, $order->status);
+    }
+
+    /**
+     * 14. Regresi: Penanganan PostTooLargeException (HTTP 413)
+     */
+    public function test_post_too_large_exception_handling(): void
+    {
+        $order = $this->createOrderForCustomer($this->customerA, OrderStatus::Diproses);
+
+        // 1. JSON / AJAX request returns HTTP 413 with user-friendly message
+        $responseJson = $this->actingAs($this->admin)
+            ->withServerVariables(['CONTENT_LENGTH' => 999999999])
+            ->postJson(route('admin.orders.ship', $order));
+        $responseJson->assertStatus(413);
+        $responseJson->assertJson([
+            'message' => 'Ukuran file terlalu besar. Silakan kompres atau pilih file yang lebih kecil, kemudian coba kembali.',
+            'error'   => 'post_too_large',
+        ]);
+
+        // 2. Web request renders user-friendly HTTP 413 page with friendly message
+        $responseWeb = $this->actingAs($this->admin)
+            ->withServerVariables(['CONTENT_LENGTH' => 999999999])
+            ->from(route('admin.orders.show', $order))
+            ->post(route('admin.orders.ship', $order));
+        $responseWeb->assertStatus(413);
+        $responseWeb->assertSee('Ukuran file terlalu besar. Silakan kompres atau pilih file yang lebih kecil, kemudian coba kembali.');
+    }
+
+    /**
+     * 15. Verifikasi zona waktu server Asia/Jakarta dan waktu pesanan real-time.
+     */
+    public function test_order_placement_uses_real_time_asia_jakarta_timezone(): void
+    {
+        $this->assertEquals('Asia/Jakarta', config('app.timezone'));
+        $this->assertEquals('Asia/Jakarta', now()->timezoneName);
+
+        $order = $this->createOrderForCustomer($this->customerA, OrderStatus::MenungguKonfirmasi);
+
+        // Generator nomor pesanan mengandung tanggal hari ini zona Jakarta (Asia/Jakarta)
+        $generator = app(\App\Services\OrderNumberGenerator::class);
+        $generatedNumber = $generator->generate();
+        $this->assertStringContainsString('RHS-' . now()->format('Ymd'), $generatedNumber);
+
+        // Halaman detail pesanan admin menampilkan waktu WIB
+        $responseAdmin = $this->actingAs($this->admin)->get(route('admin.orders.show', $order));
+        $responseAdmin->assertStatus(200);
+        $responseAdmin->assertSee('WIB');
+        $responseAdmin->assertSee($order->created_at->translatedFormat('l, d F Y - H:i'));
+
+        // Halaman detail pesanan customer menampilkan waktu WIB
+        $responseCustomer = $this->actingAs($this->customerA)->get(route('customer.orders.show', $order->order_number));
+        $responseCustomer->assertStatus(200);
+        $responseCustomer->assertSee('WIB');
+        $responseCustomer->assertSee($order->created_at->translatedFormat('l, d F Y - H:i'));
+
+        // Pesan WhatsApp mengandung WIB
+        $waBuilder = app(\App\Services\WhatsAppMessageBuilder::class);
+        $message = $waBuilder->buildMessage($order);
+        $this->assertStringContainsString('WIB', $message);
+        $this->assertStringContainsString($order->created_at->format('d/m/Y H:i'), $message);
+
+        // Halaman checkout menampilkan komponen waktu real-time
+        // Simulasikan keranjang belanja tidak kosong
+        $cart = app(\App\Services\CartService::class);
+        $cart->add($this->variant->id, 1);
+
+        $responseCheckout = $this->get(route('checkout.index'));
+        $responseCheckout->assertStatus(200);
+        $responseCheckout->assertSee('Waktu Pemesanan');
+        $responseCheckout->assertSee('WIB');
+    }
 }

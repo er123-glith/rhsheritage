@@ -1,0 +1,63 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
+  <defs>
+    <linearGradient id="rhsGold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#F5EDD5"/>
+      <stop offset="50%" stop-color="#D4AF37"/>
+      <stop offset="100%" stop-color="#A08429"/>
+    </linearGradient>
+    <radialGradient id="rhsForest" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#1A5442"/>
+      <stop offset="70%" stop-color="#0F3D2E"/>
+      <stop offset="100%" stop-color="#08221A"/>
+    </radialGradient>
+    <filter id="subtleShadow" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000000" flood-opacity="0.4"/>
+    </filter>
+  </defs>
+
+  <!-- Outer Ring with contrast border for dark & light browser tabs -->
+  <circle cx="256" cy="256" r="248" fill="#08221A" stroke="url(#rhsGold)" stroke-width="14" filter="url(#subtleShadow)"/>
+  
+  <!-- Main Forest Green Field -->
+  <circle cx="256" cy="256" r="236" fill="url(#rhsForest)"/>
+  
+  <!-- Heritage Ornamental Inner Ring -->
+  <circle cx="256" cy="256" r="216" fill="none" stroke="url(#rhsGold)" stroke-width="3" stroke-dasharray="10 6" opacity="0.8"/>
+  <circle cx="256" cy="256" r="204" fill="none" stroke="url(#rhsGold)" stroke-width="2" opacity="0.6"/>
+
+  <!-- Top Crown Accent -->
+  <path d="M216 145 L256 125 L296 145 L284 165 L228 165 Z" fill="url(#rhsGold)"/>
+  <circle cx="216" cy="140" r="5" fill="#F5EDD5"/>
+  <circle cx="256" cy="120" r="6" fill="#F5EDD5"/>
+  <circle cx="296" cy="140" r="5" fill="#F5EDD5"/>
+
+  <!-- Centered RHS Brand Monogram -->
+  <text x="256" y="295" 
+        text-anchor="middle" 
+        font-family="'Playfair Display', 'Cinzel', 'Georgia', 'Times New Roman', serif" 
+        font-size="160" 
+        font-weight="900" 
+        letter-spacing="6" 
+        fill="url(#rhsGold)" 
+        stroke="#4A3D12" 
+        stroke-width="3">RHS</text>
+
+  <!-- Heritage Subtext -->
+  <text x="256" y="375" 
+        text-anchor="middle" 
+        font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', 'Inter', sans-serif" 
+        font-size="34" 
+        font-weight="700" 
+        letter-spacing="10" 
+        fill="#F5EDD5" 
+        opacity="0.9">HERITAGE</text>
+  
+  <text x="256" y="415" 
+        text-anchor="middle" 
+        font-family="-apple-system, BlinkMacSystemFont, 'Plus Jakarta Sans', 'Inter', sans-serif" 
+        font-size="20" 
+        font-weight="600" 
+        letter-spacing="4" 
+        fill="url(#rhsGold)" 
+        opacity="0.85">EST. 2004</text>
+</svg>

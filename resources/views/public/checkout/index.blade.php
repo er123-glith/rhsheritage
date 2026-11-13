@@ -43,7 +43,30 @@
             }
         },
 
+        currentDateTime: '',
+        updateClock() {
+            try {
+                const now = new Date();
+                const formatter = new Intl.DateTimeFormat('id-ID', {
+                    timeZone: 'Asia/Jakarta',
+                    weekday: 'long',
+                    day: 'numeric',
+                    month: 'long',
+                    year: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit',
+                    hour12: false
+                });
+                this.currentDateTime = formatter.format(now) + ' WIB';
+            } catch (e) {
+                this.currentDateTime = new Date().toLocaleTimeString('id-ID') + ' WIB';
+            }
+        },
+
         init() {
+            this.updateClock();
+            setInterval(() => this.updateClock(), 1000);
             if (this.selectedZoneId) {
                 this.updateShipping(this.selectedZoneId);
             }
@@ -243,9 +266,23 @@
 
                 <!-- Order Summary (4 cols) -->
                 <div class="lg:col-span-4 bg-white rounded-2xl border border-neutral-200 p-6 shadow-1 space-y-6 sticky top-28" data-aos="fade-left" data-aos-delay="150" data-aos-duration="650">
-                    <h2 class="font-display text-lg font-bold text-neutral-800 border-b border-neutral-100 pb-3">
-                        Rincian Tagihan
-                    </h2>
+                    <div class="border-b border-neutral-100 pb-3">
+                        <h2 class="font-display text-lg font-bold text-neutral-800">
+                            Rincian Tagihan
+                        </h2>
+                        <!-- Waktu Pemesanan Real-Time Asia/Jakarta -->
+                        <div class="mt-2 p-2.5 rounded-lg bg-canvas-sunken border border-neutral-200/80 flex items-center justify-between text-xs font-body">
+                            <span class="flex items-center gap-1.5 text-neutral-500 font-medium">
+                                <svg class="w-3.5 h-3.5 text-primary-700 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <span>Waktu:</span>
+                            </span>
+                            <span class="font-mono font-bold text-primary-800 text-[11px]" x-text="currentDateTime">
+                                {{ now()->translatedFormat('d M Y, H:i:s') }} WIB
+                            </span>
+                        </div>
+                    </div>
 
                     <!-- Items Preview -->
                     <div class="space-y-3 max-h-52 overflow-y-auto pr-1">

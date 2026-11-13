@@ -13,10 +13,15 @@ class OwnerSeeder extends Seeder
         User::updateOrCreate(
             ['email' => config('shop.owner_email', 'owner@rhsheritage.example')],
             [
-                'name' => 'Owner RHS HERITAGE',
-                'password' => Hash::make(config('shop.owner_initial_password', 'password')),
-                'is_owner' => true,
-                'role' => 'admin',
+                'name'              => 'Owner RHS HERITAGE',
+                'password'          => Hash::make(config('shop.owner_initial_password', 'password')),
+                'is_owner'          => true,
+                'role'              => 'admin',
+                'phone'             => '085728979999',
+                'address'           => 'Griya RHS Heritage, Jl. Budaya Warisan No. 88',
+                'city'              => 'Surakarta',
+                'province'          => 'Jawa Tengah',
+                'postal_code'       => '57126',
                 'email_verified_at' => now(),
             ]
         );
@@ -24,10 +29,15 @@ class OwnerSeeder extends Seeder
         User::updateOrCreate(
             ['email' => 'admin@gmail.com'],
             [
-                'name' => 'Admin RHS HERITAGE',
-                'password' => Hash::make('12345678'),
-                'is_owner' => true,
-                'role' => 'admin',
+                'name'              => 'Admin RHS HERITAGE',
+                'password'          => Hash::make('12345678'),
+                'is_owner'          => true,
+                'role'              => 'admin',
+                'phone'             => '085728979999',
+                'address'           => 'Griya RHS Heritage, Jl. Budaya Warisan No. 88',
+                'city'              => 'Surakarta',
+                'province'          => 'Jawa Tengah',
+                'postal_code'       => '57126',
                 'email_verified_at' => now(),
             ]
         );

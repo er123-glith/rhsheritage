@@ -77,7 +77,14 @@
                         <span class="font-body text-xs text-neutral-500 block">Status Terkini:</span>
                         <p class="font-display text-xl font-bold text-neutral-800">{{ $order->order_number }}</p>
                     </div>
-                    <div>
+                    <div class="flex items-center gap-2">
+                        <a 
+                            href="{{ route('order.invoice', $order->order_number) }}" 
+                            target="_blank"
+                            class="inline-flex items-center px-3 py-1.5 rounded-lg border border-neutral-300 bg-white text-neutral-700 font-body text-xs font-semibold hover:bg-neutral-50 transition shadow-xs"
+                        >
+                            <span>Invoice (PDF)</span>
+                        </a>
                         <x-status-badge :status="$order->status" />
                     </div>
                 </div>
@@ -97,28 +104,8 @@
                     </div>
                 @endif
 
-                <!-- Status Timeline History -->
-                @if($order->statusLogs && $order->statusLogs->isNotEmpty())
-                    <div>
-                        <h4 class="font-body text-xs font-bold uppercase tracking-wider text-neutral-500 mb-4">
-                            Riwayat Perjalanan Pesanan
-                        </h4>
-                        <div class="space-y-4 pl-3 border-l-2 border-primary-200">
-                            @foreach($order->statusLogs as $index => $log)
-                                <div class="relative" data-aos="fade-left" data-aos-delay="{{ 100 * ($index + 1) }}">
-                                    <span class="absolute -left-[19px] top-1 w-2.5 h-2.5 rounded-full bg-primary-700 ring-4 ring-white"></span>
-                                    <div class="font-body text-xs">
-                                        <span class="font-bold text-neutral-800">{{ $log->status->label() ?? $log->status }}</span>
-                                        <span class="text-neutral-400 ml-2">{{ $log->created_at->format('d M Y, H:i') }} WIB</span>
-                                        @if($log->notes)
-                                            <p class="text-neutral-600 mt-0.5">{{ $log->notes }}</p>
-                                        @endif
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-                    </div>
-                @endif
+                <!-- Status Timeline & Activity Log -->
+                <x-order.progress-timeline :order="$order" context="public" />
 
                 <!-- Items Purchased -->
                 <div class="pt-4 border-t border-neutral-100">

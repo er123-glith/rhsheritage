@@ -46,7 +46,7 @@
     <!-- Top Announcement Bar (Desktop) -->
     <div class="bg-primary-900 text-gold-200 text-xs py-2 px-4 text-center font-medium border-b border-primary-800 hidden sm:block">
         <div class="max-w-7xl mx-auto flex items-center justify-between">
-            <p>Kriya Tradisi Keluarga Sejak 2004 — Menerima Pesanan Retail, Grosir & Kemitraan Sekolah</p>
+            <p>Kriya Tradisi Keluarga Sejak 2004 Menerima Pesanan Retail, Grosir & Kemitraan Sekolah</p>
             <div class="flex items-center gap-4">
                 <a href="{{ route('order.track') }}" class="text-primary-100 hover:text-white transition">Lacak Pesanan</a>
                 <span class="text-primary-700">|</span>

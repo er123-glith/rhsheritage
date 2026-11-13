@@ -32,6 +32,29 @@ class OrderController extends Controller
         return view('public.order.confirmation', compact('order', 'whatsappUrl'));
     }
 
+    /**
+     * Tampilkan invoice resmi untuk konfirmasi pesanan publik.
+     */
+    public function invoice(string $orderNumber)
+    {
+        $order = Order::with(['orderItems', 'shippingZone', 'user', 'deliveryConfirmedBy'])
+            ->where('order_number', $orderNumber)
+            ->firstOrFail();
+
+        // Otorisasi akses jika order terikat dengan user akun
+        if ($order->user_id !== null) {
+            $user = auth()->user();
+            if (! $user || ($user->id !== $order->user_id && ! $user->isAdmin())) {
+                if (! $user) {
+                    return redirect()->route('login')->with('info', 'Silakan login terlebih dahulu untuk mengakses invoice pesanan Anda.');
+                }
+                abort(403, 'Akses ditolak. Anda tidak memiliki izin untuk melihat invoice ini.');
+            }
+        }
+
+        return view('invoices.order-invoice', compact('order'));
+    }
+
     /** Tampilkan riwayat pesanan milik customer yang sedang login. */
     public function myOrders()
     {
@@ -55,7 +78,7 @@ class OrderController extends Controller
      */
     public function track(TrackOrderRequest $request)
     {
-        $order = Order::with(['orderItems', 'shippingZone', 'statusLogs'])
+        $order = Order::with(['orderItems', 'shippingZone', 'statusLogs', 'returns', 'deliveryConfirmedBy'])
             ->where('order_number', strtoupper(trim($request->validated('order_number'))))
             ->where('customer_phone', $request->validated('customer_phone'))
             ->first();

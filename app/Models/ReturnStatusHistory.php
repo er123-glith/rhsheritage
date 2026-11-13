@@ -39,3 +39,4 @@ class ReturnStatusHistory extends Model
         return $this->belongsTo(User::class, 'actor_id')->withTrashed();
     }
 }
+

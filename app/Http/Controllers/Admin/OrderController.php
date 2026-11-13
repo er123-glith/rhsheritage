@@ -64,7 +64,7 @@ class OrderController extends Controller
 
     public function show(Order $order): View
     {
-        $order->load(['items.variant.product.primaryImage', 'shippingZone', 'statusLogs', 'user']);
+        $order->load(['items.variant.product.primaryImage', 'shippingZone', 'statusLogs', 'user', 'returns', 'deliveryConfirmedBy']);
 
         // Sanitasi nomor telepon pelanggan untuk link WhatsApp (e.g. 0812 -> 62812)
         $phone = preg_replace('/[^0-9]/', '', $order->customer_phone);
@@ -76,6 +76,16 @@ class OrderController extends Controller
         $customerWaUrl = "https://wa.me/{$phone}?text={$waMessage}";
 
         return view('admin.orders.show', compact('order', 'customerWaUrl'));
+    }
+
+    /**
+     * Tampilkan pratinjau invoice resmi berstandar A4 siap cetak dan ekspor ke PDF.
+     */
+    public function invoice(Order $order): View
+    {
+        $order->load(['orderItems', 'shippingZone', 'user', 'deliveryConfirmedBy']);
+
+        return view('invoices.order-invoice', compact('order'));
     }
 
     public function confirm(Order $order, OrderStatusService $service): RedirectResponse
@@ -115,18 +125,22 @@ class OrderController extends Controller
             return back()->with('error', "Pesanan hanya dapat dikirim jika berstatus 'Diproses'. Status saat ini: {$order->status->label()}.");
         }
 
+        $maxKb = config('uploads.shipping_proof.max_kb', 2048);
+        $mimesRule = config('uploads.shipping_proof.mimes_rule', 'mimes:jpg,jpeg,png,webp');
+        $uploadErrors = config('uploads.shipping_proof.error_messages', []);
+
         $validated = $request->validate([
             'tracking_number' => ['required', 'string', 'max:60'],
             'shipping_date'   => ['required', 'date'],
-            'shipping_proof'  => ['required', 'file', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'shipping_proof'  => ['required', 'file', $mimesRule, 'max:' . $maxKb],
             'shipping_note'   => ['nullable', 'string', 'max:500'],
-        ], [
+        ], array_merge([
             'tracking_number.required' => 'Nomor resi J&T Express wajib diisi.',
             'shipping_date.required'   => 'Tanggal pengiriman wajib diisi.',
             'shipping_proof.required'  => 'Foto bukti struk resi pengiriman wajib diunggah.',
             'shipping_proof.mimes'     => 'Foto bukti pengiriman harus berformat JPG, JPEG, PNG, atau WEBP.',
             'shipping_proof.max'       => 'Ukuran foto bukti resi maksimal 2 MB.',
-        ]);
+        ], $uploadErrors));
 
         $proofPath = $request->file('shipping_proof')->store('secure_proofs/shipping', 'local');
 

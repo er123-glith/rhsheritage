@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "@fortawesome/fontawesome-free/css/all.min.css";
 
 @custom-variant dark (&:where(.dark, .dark *));
 
@@ -6,6 +7,11 @@
 @source '../../storage/framework/views/*.php';
 @source '../views/**/*.blade.php';
 @source '../js/**/*.js';
+
+/* ── Alpine.js Cloak ───────────────────────────── */
+[x-cloak] {
+  display: none !important;
+}
 
 @theme {
   /* ── Primary — Forest ───────────────────────────── */
@@ -186,6 +192,53 @@
   color: #769186 !important;
 }
 
+/* ── Specific Dark Mode Color Overrides for Heritage Branding ── */
+.dark a.text-primary-700,
+.dark h1.text-primary-700,
+.dark h2.text-primary-700,
+.dark h3.text-primary-700 {
+  color: #D4AF37 !important;
+}
+
+.dark a.text-primary-700:hover {
+  color: #EEDFB2 !important;
+}
+
+.dark .bg-primary-50 {
+  background-color: #142820 !important;
+  color: #E6F2EC !important;
+}
+
+.dark .bg-gold-50 {
+  background-color: #262010 !important;
+  color: #EEDFB2 !important;
+}
+
+.dark .bg-amber-50 {
+  background-color: #261D0C !important;
+}
+
+.dark .bg-emerald-50 {
+  background-color: #0E281C !important;
+}
+
+.dark .bg-sky-50 {
+  background-color: #0F2330 !important;
+}
+
+.dark .bg-rose-50 {
+  background-color: #2A1215 !important;
+}
+
+.dark .bg-purple-50 {
+  background-color: #23142B !important;
+}
+
+/* Ensure product images are never inverted by CSS */
+.dark img {
+  filter: none !important;
+}
+
 /* ── Theme Toggle Icon Helpers ───────────────────── */
 html:not(.dark) .js-theme-icon-sun {
   display: none !important;
@@ -300,4 +353,19 @@ body {
 .dark .rhs-swal-cancel:hover {
   background-color: #2d453c !important;
   color: #ffffff !important;
+}
+
+/* ── Dashboard Layout: Fixed Sidebar & Synchronized Content Offset ── */
+:root {
+  --dashboard-sidebar-width: 18rem; /* 288px (matching w-72 & md:pl-72) */
+}
+
+@media (min-width: 768px) {
+  aside.w-72 {
+    width: var(--dashboard-sidebar-width) !important;
+  }
+
+  .md\:pl-72 {
+    padding-left: var(--dashboard-sidebar-width) !important;
+  }
 }

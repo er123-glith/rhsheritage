@@ -57,16 +57,30 @@
                     </a>
                 @endif
 
-                <button 
-                    onclick="window.print()" 
-                    type="button" 
-                    class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-neutral-300 bg-white text-neutral-700 font-body text-xs font-semibold hover:bg-neutral-50 transition shadow-xs"
+                @if($order->status === \App\Enums\OrderStatus::Selesai)
+                    @if($order->review)
+                        <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 font-body text-xs font-semibold">
+                            <i class="fa-solid fa-star text-gold-500"></i>
+                            <span>Sudah Diulas ({{ $order->review->rating }}★)</span>
+                        </span>
+                    @else
+                        <a 
+                            href="{{ route('customer.reviews.create', $order->order_number) }}" 
+                            class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-gold-500 hover:bg-gold-400 text-neutral-900 font-body text-xs font-bold transition shadow-xs"
+                        >
+                            <i class="fa-solid fa-star text-neutral-900"></i>
+                            <span>Beri Ulasan Toko</span>
+                        </a>
+                    @endif
+                @endif
+
+                <a 
+                    href="{{ route('customer.orders.invoice', $order->order_number) }}" 
+                    target="_blank"
+                    class="inline-flex items-center px-3.5 py-1.5 rounded-lg border border-neutral-300 dark:border-neutral-700 bg-white dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 font-body text-xs font-semibold hover:bg-neutral-50 dark:hover:bg-neutral-700 transition shadow-xs"
                 >
-                    <svg class="w-4 h-4 text-neutral-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                    </svg>
-                    <span>Cetak Bukti</span>
-                </button>
+                    <span>Cetak Invoice Resmi (PDF)</span>
+                </a>
             </div>
         </div>
 
@@ -112,6 +126,66 @@
                     <p class="font-body text-sm mt-0.5 font-medium">{{ $order->cancellation_reason }}</p>
                 </div>
             </div>
+        @endif
+
+        @if($order->status === \App\Enums\OrderStatus::Selesai)
+            @if($order->review)
+                <!-- Customer Review Card -->
+                <div class="rounded-xl bg-white dark:bg-[#15221d] border border-neutral-200 dark:border-neutral-700 shadow-1 p-5">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-neutral-100 dark:border-neutral-800">
+                        <div class="flex items-center gap-2">
+                            <span class="text-gold-500 text-sm">
+                                @for($i = 1; $i <= 5; $i++)
+                                    <i class="{{ $i <= $order->review->rating ? 'fa-solid fa-star' : 'fa-regular fa-star text-neutral-300 dark:text-neutral-600' }}"></i>
+                                @endfor
+                            </span>
+                            <span class="font-bold text-sm text-neutral-800 dark:text-white">{{ $order->review->rating }}.0 / 5.0</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="px-2.5 py-0.5 rounded-full text-xs font-semibold border {{ $order->review->moderation_status_badge_class }}">
+                                {{ $order->review->moderation_status_label }}
+                            </span>
+                            <span class="text-xs text-neutral-400">{{ $order->review->created_at->translatedFormat('d M Y, H:i') }} WIB</span>
+                        </div>
+                    </div>
+                    <div class="mt-3">
+                        <p class="font-body text-xs uppercase tracking-wider font-bold text-neutral-400 mb-1">Ulasan Toko Anda:</p>
+                        <p class="font-body text-sm text-neutral-700 dark:text-neutral-200 italic leading-relaxed">
+                            "{{ $order->review->review }}"
+                        </p>
+                        @if($order->review->moderation_status === \App\Models\Review::STATUS_PENDING_REVIEW)
+                            <p class="mt-2 text-xs text-amber-700 dark:text-amber-400 flex items-center gap-1.5">
+                                <i class="fa-solid fa-clock"></i>
+                                <span>Ulasan ini sedang dalam antrean tinjauan tim moderasi admin sebelum ditampilkan di beranda utama.</span>
+                            </p>
+                        @elseif($order->review->moderation_status === \App\Models\Review::STATUS_PUBLISHED)
+                            <p class="mt-2 text-xs text-emerald-700 dark:text-emerald-400 flex items-center gap-1.5">
+                                <i class="fa-solid fa-circle-check"></i>
+                                <span>Ulasan Anda aktif dan dipublikasikan pada bagian Ulasan Pelanggan di beranda utama.</span>
+                            </p>
+                        @endif
+                    </div>
+                </div>
+            @else
+                <!-- Review Invitation Banner -->
+                <div class="rounded-xl bg-gradient-to-r from-gold-500/10 via-primary-500/10 to-transparent border border-gold-400/40 p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                        <h3 class="font-display text-base font-bold text-neutral-900 dark:text-white flex items-center gap-2">
+                            <i class="fa-solid fa-star text-gold-500"></i>
+                            <span>Bagikan Pengalaman Belanja Anda</span>
+                        </h3>
+                        <p class="font-body text-xs text-neutral-600 dark:text-neutral-300 mt-1">
+                            Pesanan Anda telah selesai diterima. Ceritakan kualitas kriya Songkok / Sarung / Jilbab RHS Heritage untuk membantu pembeli lain.
+                        </p>
+                    </div>
+                    <a 
+                        href="{{ route('customer.reviews.create', $order->order_number) }}" 
+                        class="px-5 py-2.5 rounded-lg bg-gold-500 hover:bg-gold-400 text-neutral-900 font-body text-xs font-bold transition shadow-xs shrink-0 text-center"
+                    >
+                        Tulis Ulasan Sekarang &rarr;
+                    </a>
+                </div>
+            @endif
         @endif
 
         <!-- Main Content Grid -->
@@ -205,37 +279,8 @@
                     </div>
                 </div>
 
-                <!-- Status Timeline Card -->
-                <div class="bg-white rounded-xl border border-neutral-200 shadow-1 p-6">
-                    <h2 class="font-display text-base font-bold text-primary-700 mb-4">Perkembangan Pesanan</h2>
-
-                    <div class="space-y-4">
-                        @forelse($order->statusLogs as $log)
-                            <div class="flex items-start gap-3">
-                                <div class="w-8 h-8 rounded-full bg-primary-100 text-primary-700 flex items-center justify-center shrink-0 mt-0.5 font-bold text-xs">
-                                    ✓
-                                </div>
-                                <div class="flex-1">
-                                    <div class="flex items-center justify-between">
-                                        <p class="font-body text-sm font-semibold text-neutral-800">
-                                            Status diubah menjadi: <span class="text-primary-700 font-bold">{{ $log->to_status?->label() ?? $log->to_status }}</span>
-                                        </p>
-                                        <span class="font-body text-xs text-neutral-400">
-                                            {{ $log->created_at->translatedFormat('d M Y, H:i') }} WIB
-                                        </span>
-                                    </div>
-                                    @if($log->note)
-                                        <p class="font-body text-xs text-neutral-600 mt-1 bg-canvas-sunken p-2.5 rounded-lg border border-neutral-200/60">
-                                            {{ $log->note }}
-                                        </p>
-                                    @endif
-                                </div>
-                            </div>
-                        @empty
-                            <p class="text-xs text-neutral-400">Belum ada pembaruan status log.</p>
-                        @endforelse
-                    </div>
-                </div>
+                <!-- Status Timeline & Activity Log -->
+                <x-order.progress-timeline :order="$order" context="customer" />
             </div>
 
             <!-- Right Column: Shipping & Info (1 col) -->
@@ -400,6 +445,49 @@
         <div 
             x-show="confirmDeliveryModalOpen" 
             x-cloak
+            x-data="{
+                fileName: '',
+                fileSizeFormatted: '',
+                fileError: '',
+                isOverLimit: false,
+                maxBytes: {{ config('uploads.delivery_proof.max_bytes', 5242880) }},
+                maxMb: {{ config('uploads.delivery_proof.max_mb', 5) }},
+                handleFileSelect(e) {
+                    const file = e.target.files[0];
+                    if (!file) {
+                        this.resetFile();
+                        return;
+                    }
+                    this.fileName = file.name;
+                    const sizeKb = file.size / 1024;
+                    this.fileSizeFormatted = sizeKb < 1024
+                        ? sizeKb.toFixed(1) + ' KB'
+                        : (sizeKb / 1024).toFixed(2) + ' MB';
+
+                    if (file.size > this.maxBytes) {
+                        this.isOverLimit = true;
+                        this.fileError = 'Ukuran file (' + this.fileSizeFormatted + ') melebihi batas maksimal ' + this.maxMb + ' MB. Silakan pilih foto lain atau kompres file terlebih dahulu.';
+                    } else {
+                        this.isOverLimit = false;
+                        this.fileError = '';
+                    }
+                },
+                resetFile() {
+                    this.fileName = '';
+                    this.fileSizeFormatted = '';
+                    this.fileError = '';
+                    this.isOverLimit = false;
+                    if (this.$refs.deliveryProofInput) {
+                        this.$refs.deliveryProofInput.value = '';
+                    }
+                },
+                handleSubmit(e) {
+                    if (this.isOverLimit) {
+                        e.preventDefault();
+                        return false;
+                    }
+                }
+            }"
             class="fixed inset-0 z-50 overflow-y-auto bg-neutral-900/60 backdrop-blur-xs flex items-center justify-center p-4"
         >
             <div 
@@ -416,7 +504,7 @@
                     <button @click="confirmDeliveryModalOpen = false" class="text-neutral-400 hover:text-neutral-600">✕</button>
                 </div>
 
-                <form method="POST" action="{{ route('customer.orders.confirm-delivery', $order->order_number) }}" enctype="multipart/form-data" class="mt-4 space-y-4">
+                <form method="POST" action="{{ route('customer.orders.confirm-delivery', $order->order_number) }}" enctype="multipart/form-data" @submit="handleSubmit($event)" class="mt-4 space-y-4">
                     @csrf
 
                     <p class="text-xs text-neutral-600 leading-relaxed">
@@ -426,15 +514,45 @@
                     <div>
                         <label class="block text-xs font-semibold text-neutral-700 mb-1">
                             Foto Bukti Penerimaan Barang <span class="text-danger">*</span>
-                            <span class="text-neutral-400 font-normal ml-1">(JPG, PNG, WEBP maks 5 MB)</span>
+                            <span class="text-neutral-400 font-normal ml-1">(JPG, PNG, WEBP maks {{ config('uploads.delivery_proof.max_mb', 5) }} MB)</span>
                         </label>
                         <input
+                            x-ref="deliveryProofInput"
+                            @change="handleFileSelect($event)"
                             type="file"
                             name="delivery_proof"
                             required
-                            accept="image/jpeg,image/png,image/webp"
+                            accept="{{ config('uploads.delivery_proof.accept', 'image/jpeg,image/png,image/webp') }}"
                             class="w-full text-xs text-neutral-600 file:mr-3 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100 cursor-pointer"
                         />
+
+                        <!-- File Info & Error Preview -->
+                        <template x-if="fileName">
+                            <div class="mt-2 p-2.5 rounded-lg border text-xs flex items-center justify-between"
+                                :class="isOverLimit ? 'bg-red-50 border-red-200 text-red-700' : 'bg-primary-50 border-primary-200 text-primary-800'">
+                                <div class="flex items-center gap-2 truncate pr-2">
+                                    <span x-text="isOverLimit ? '⚠️' : '✓'" class="font-bold"></span>
+                                    <span class="font-medium truncate" x-text="fileName"></span>
+                                    <span class="text-2xs opacity-75 whitespace-nowrap" x-text="'(' + fileSizeFormatted + ')'"></span>
+                                </div>
+                                <button 
+                                    type="button" 
+                                    @click="resetFile()" 
+                                    class="text-xs font-semibold hover:underline shrink-0"
+                                    :class="isOverLimit ? 'text-red-700' : 'text-primary-700'"
+                                >
+                                    Ganti
+                                </button>
+                            </div>
+                        </template>
+
+                        <!-- Inline Error Message -->
+                        <template x-if="fileError">
+                            <p class="mt-1.5 text-xs text-danger font-medium flex items-center gap-1" x-text="fileError"></p>
+                        </template>
+                        @error('delivery_proof')
+                            <p class="mt-1 text-xs text-danger font-medium">{{ $message }}</p>
+                        @enderror
                     </div>
 
                     <div class="p-3 bg-amber-50 border border-amber-200 rounded-lg">
@@ -462,7 +580,9 @@
                         </button>
                         <button 
                             type="submit" 
-                            class="px-5 py-2 rounded-lg text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs"
+                            :disabled="isOverLimit"
+                            :class="isOverLimit ? 'opacity-50 cursor-not-allowed bg-neutral-400' : 'bg-emerald-600 hover:bg-emerald-700'"
+                            class="px-5 py-2 rounded-lg text-xs font-bold text-white shadow-xs transition"
                         >
                             Konfirmasi Selesai
                         </button>

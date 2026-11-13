@@ -79,3 +79,4 @@ class SecureFileController extends Controller
         return Storage::disk('local')->response($path);
     }
 }
+
