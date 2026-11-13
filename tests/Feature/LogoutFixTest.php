@@ -24,7 +24,7 @@ class LogoutFixTest extends TestCase
         $response->assertSessionHas('status', 'Anda telah berhasil keluar.');
     }
 
-    public function test_admin_can_logout_via_get_without_method_not_allowed_exception(): void
+    public function test_admin_get_logout_does_not_terminate_session(): void
     {
         $admin = User::factory()->create([
             'role'     => 'admin',
@@ -33,22 +33,22 @@ class LogoutFixTest extends TestCase
 
         $response = $this->actingAs($admin)->get('/admin/logout');
 
-        $this->assertGuest();
+        // Sesi HARUS tetap aktif, pengguna TIDAK boleh logout via GET
+        $this->assertAuthenticatedAs($admin);
         $response->assertStatus(302);
-        $response->assertRedirect('/admin/login');
-        $response->assertSessionHas('status', 'Anda telah berhasil keluar.');
+        $response->assertRedirect(route('admin.dashboard'));
     }
 
-    public function test_guest_accessing_admin_logout_via_get_redirects_gracefully(): void
+    public function test_guest_accessing_admin_logout_via_get_redirects_to_login(): void
     {
         $response = $this->get('/admin/logout');
 
         $this->assertGuest();
         $response->assertStatus(302);
-        $response->assertRedirect('/admin/login');
+        $response->assertRedirect(route('admin.login'));
     }
 
-    public function test_customer_accessing_admin_logout_via_get_terminates_session_and_redirects(): void
+    public function test_customer_accessing_admin_logout_via_get_does_not_terminate_session(): void
     {
         $customer = User::factory()->create([
             'role'     => 'customer',
@@ -57,9 +57,10 @@ class LogoutFixTest extends TestCase
 
         $response = $this->actingAs($customer)->get('/admin/logout');
 
-        $this->assertGuest();
+        // Sesi tetap aktif sebagai customer
+        $this->assertAuthenticatedAs($customer);
         $response->assertStatus(302);
-        $response->assertRedirect('/admin/login');
+        $response->assertRedirect(route('customer.dashboard'));
     }
 
     public function test_customer_can_logout_via_post(): void
@@ -76,7 +77,7 @@ class LogoutFixTest extends TestCase
         $response->assertSessionHas('success', 'Anda telah berhasil keluar.');
     }
 
-    public function test_customer_can_logout_via_get_without_exception(): void
+    public function test_customer_get_logout_does_not_terminate_session(): void
     {
         $customer = User::factory()->create([
             'role'     => 'customer',
@@ -85,10 +86,10 @@ class LogoutFixTest extends TestCase
 
         $response = $this->actingAs($customer)->get('/logout');
 
-        $this->assertGuest();
+        // Sesi HARUS tetap aktif, pengguna TIDAK boleh logout via GET
+        $this->assertAuthenticatedAs($customer);
         $response->assertStatus(302);
-        $response->assertRedirect(route('home'));
-        $response->assertSessionHas('success', 'Anda telah berhasil keluar.');
+        $response->assertRedirect(route('customer.dashboard'));
     }
 
     public function test_admin_blade_view_contains_post_form_for_logout(): void

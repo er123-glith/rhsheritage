@@ -54,6 +54,14 @@ Route::middleware('auth')->group(function () {
 
     Route::put('password', [PasswordController::class, 'update'])->name('password.update');
 
-    Route::match(['get', 'post'], 'logout', [AuthenticatedSessionController::class, 'destroy'])
+    // Graceful fallback GET untuk /logout — redirect aman TANPA mengakhiri sesi
+    Route::get('logout', function () {
+        return auth()->user()?->isAdmin()
+            ? redirect()->route('admin.dashboard')
+            : redirect()->route('customer.dashboard');
+    });
+
+    // POST logout resmi — satu-satunya metode yang mengakhiri sesi dengan proteksi CSRF
+    Route::post('logout', [AuthenticatedSessionController::class, 'destroy'])
         ->name('logout');
 });
