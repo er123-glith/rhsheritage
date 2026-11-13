@@ -3,6 +3,7 @@
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\CustomerController;
+use App\Http\Controllers\Admin\CustomerPasswordController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\PartnerApplicationController;
@@ -80,6 +81,8 @@ Route::prefix('admin')->group(function () {
         Route::get('/pelanggan/{customer}', [CustomerController::class, 'show'])->name('admin.customers.show');
         Route::get('/pelanggan/{customer}/edit', [CustomerController::class, 'edit'])->name('admin.customers.edit');
         Route::put('/pelanggan/{customer}', [CustomerController::class, 'update'])->name('admin.customers.update');
+        Route::get('/pelanggan/{customer}/ganti-password', [CustomerPasswordController::class, 'edit'])->name('admin.customers.password.edit');
+        Route::put('/pelanggan/{customer}/ganti-password', [CustomerPasswordController::class, 'update'])->middleware('throttle:5,1')->name('admin.customers.password.update');
         Route::delete('/pelanggan/{customer}', [CustomerController::class, 'destroy'])->name('admin.customers.destroy');
 
         // Grosir & Mitra

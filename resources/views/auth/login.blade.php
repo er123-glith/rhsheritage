@@ -77,16 +77,9 @@
 
         <!-- Password -->
         <div>
-            <div class="flex items-center justify-between mb-1.5">
-                <label for="password" class="block text-xs font-semibold text-neutral-700">
-                    Kata Sandi <span class="text-danger">*</span>
-                </label>
-                @if (Route::has('password.request'))
-                    <a href="{{ route('password.request') }}" class="text-xs text-primary-700 hover:text-primary-800 hover:underline">
-                        Lupa kata sandi?
-                    </a>
-                @endif
-            </div>
+            <label for="password" class="block text-xs font-semibold text-neutral-700 mb-1.5">
+                Kata Sandi <span class="text-danger">*</span>
+            </label>
             <input
                 id="password"
                 type="password"
@@ -96,6 +89,9 @@
                 placeholder="••••••••"
                 class="w-full h-11 px-3.5 rounded-lg bg-canvas-sunken text-sm text-neutral-800 border border-neutral-200 focus:bg-white focus:border-primary-600 focus:ring-2 focus:ring-primary-500/20 focus:outline-none transition"
             >
+            <p class="mt-1.5 text-[11px] text-neutral-500 font-body leading-normal">
+                Perubahan kata sandi dapat dilakukan melalui Profil Saya setelah Anda masuk. Apabila mengalami kendala akses akun, silakan hubungi Administrator RHS Heritage.
+            </p>
         </div>
 
         <!-- Remember Me -->

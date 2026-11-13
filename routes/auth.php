@@ -22,17 +22,8 @@ Route::middleware('guest')->group(function () {
 
     Route::post('login', [AuthenticatedSessionController::class, 'store']);
 
-    Route::get('forgot-password', [PasswordResetLinkController::class, 'create'])
-        ->name('password.request');
-
-    Route::post('forgot-password', [PasswordResetLinkController::class, 'store'])
-        ->name('password.email');
-
-    Route::get('reset-password/{token}', [NewPasswordController::class, 'create'])
-        ->name('password.reset');
-
-    Route::post('reset-password', [NewPasswordController::class, 'store'])
-        ->name('password.store');
+    // Catatan Keamanan: Fitur reset password melalui email dinonaktifkan sesuai spesifikasi Section D.
+    // Perubahan kata sandi dilakukan secara mandiri via menu Profil setelah login, atau oleh Admin via Manajemen Pelanggan.
 });
 
 Route::middleware('auth')->group(function () {
