@@ -78,6 +78,9 @@ Route::prefix('admin')->group(function () {
         // Manajemen Pelanggan (Customer)
         Route::get('/pelanggan', [CustomerController::class, 'index'])->name('admin.customers.index');
         Route::get('/pelanggan/{customer}', [CustomerController::class, 'show'])->name('admin.customers.show');
+        Route::get('/pelanggan/{customer}/edit', [CustomerController::class, 'edit'])->name('admin.customers.edit');
+        Route::put('/pelanggan/{customer}', [CustomerController::class, 'update'])->name('admin.customers.update');
+        Route::delete('/pelanggan/{customer}', [CustomerController::class, 'destroy'])->name('admin.customers.destroy');
 
         // Grosir & Mitra
         Route::get('/grosir-mitra', [PartnerApplicationController::class, 'index'])->name('admin.partners.index');

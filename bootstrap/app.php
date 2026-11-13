@@ -16,10 +16,15 @@ return Application::configure(basePath: dirname(__DIR__))
         },
     )
     ->withMiddleware(function (Middleware $middleware): void {
+        $middleware->web(append: [
+            \App\Http\Middleware\EnsureAccountIsActive::class,
+        ]);
+
         $middleware->alias([
             'verified.owner' => \App\Http\Middleware\EnsureOwner::class,
             'role'           => \App\Http\Middleware\EnsureRole::class,
             'cart.auth'      => \App\Http\Middleware\EnsureAuthenticatedForCart::class,
+            'account.active' => \App\Http\Middleware\EnsureAccountIsActive::class,
         ]);
 
         $middleware->redirectTo(

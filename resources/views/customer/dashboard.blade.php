@@ -31,16 +31,16 @@
         </div>
 
         <!-- Summary KPI Cards (Live DB data) -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
             <!-- Total Orders -->
             <a href="{{ route('customer.orders') }}" class="bg-white rounded-xl p-5 border border-neutral-200 shadow-1 flex items-center justify-between hover:border-primary-400 hover:shadow-2 transition group">
                 <div>
                     <p class="font-body text-xs uppercase tracking-wider text-neutral-500 font-semibold group-hover:text-primary-700 transition">Total Pesanan</p>
-                    <p class="font-body text-3xl font-bold text-primary-700 mt-1">{{ $totalOrders }}</p>
-                    <p class="font-body text-xs text-neutral-400 mt-1">Semua transaksi Anda →</p>
+                    <p class="font-body text-2xl font-bold text-primary-700 mt-1">{{ $totalOrders }}</p>
+                    <p class="font-body text-[11px] text-neutral-400 mt-1">Semua transaksi →</p>
                 </div>
-                <div class="w-12 h-12 rounded-lg bg-primary-50 text-primary-700 flex items-center justify-center font-bold group-hover:scale-105 transition">
-                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div class="w-10 h-10 rounded-lg bg-primary-50 text-primary-700 flex items-center justify-center font-bold group-hover:scale-105 transition">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                     </svg>
                 </div>
@@ -50,11 +50,11 @@
             <a href="{{ route('customer.orders', ['status' => 'menunggu_konfirmasi']) }}" class="bg-white rounded-xl p-5 border border-neutral-200 shadow-1 flex items-center justify-between hover:border-gold-400 hover:shadow-2 transition group">
                 <div>
                     <p class="font-body text-xs uppercase tracking-wider text-neutral-500 font-semibold group-hover:text-gold-700 transition">Menunggu</p>
-                    <p class="font-body text-3xl font-bold text-gold-700 mt-1">{{ $pendingOrders }}</p>
-                    <p class="font-body text-xs text-neutral-400 mt-1">Verifikasi pembayaran →</p>
+                    <p class="font-body text-2xl font-bold text-gold-700 mt-1">{{ $pendingOrders }}</p>
+                    <p class="font-body text-[11px] text-neutral-400 mt-1">Verifikasi owner →</p>
                 </div>
-                <div class="w-12 h-12 rounded-lg bg-gold-100 text-gold-700 flex items-center justify-center font-bold group-hover:scale-105 transition">
-                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div class="w-10 h-10 rounded-lg bg-gold-100 text-gold-700 flex items-center justify-center font-bold group-hover:scale-105 transition">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                 </div>
@@ -63,12 +63,12 @@
             <!-- Processing / In Transit Orders -->
             <a href="{{ route('customer.orders', ['status' => 'diproses']) }}" class="bg-white rounded-xl p-5 border border-neutral-200 shadow-1 flex items-center justify-between hover:border-primary-400 hover:shadow-2 transition group">
                 <div>
-                    <p class="font-body text-xs uppercase tracking-wider text-neutral-500 font-semibold group-hover:text-primary-700 transition">Diproses / Dikirim</p>
-                    <p class="font-body text-3xl font-bold text-primary-700 mt-1">{{ $processingOrders }}</p>
-                    <p class="font-body text-xs text-neutral-400 mt-1">Sedang disiapkan & jalan →</p>
+                    <p class="font-body text-xs uppercase tracking-wider text-neutral-500 font-semibold group-hover:text-primary-700 transition">Diproses</p>
+                    <p class="font-body text-2xl font-bold text-primary-700 mt-1">{{ $processingOrders }}</p>
+                    <p class="font-body text-[11px] text-neutral-400 mt-1">Disiapkan / jalan →</p>
                 </div>
-                <div class="w-12 h-12 rounded-lg bg-primary-100 text-primary-700 flex items-center justify-center font-bold group-hover:scale-105 transition">
-                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div class="w-10 h-10 rounded-lg bg-primary-100 text-primary-700 flex items-center justify-center font-bold group-hover:scale-105 transition">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" />
                     </svg>
                 </div>
@@ -78,15 +78,29 @@
             <a href="{{ route('customer.orders', ['status' => 'selesai']) }}" class="bg-white rounded-xl p-5 border border-neutral-200 shadow-1 flex items-center justify-between hover:border-emerald-500 hover:shadow-2 transition group">
                 <div>
                     <p class="font-body text-xs uppercase tracking-wider text-neutral-500 font-semibold group-hover:text-emerald-700 transition">Pesanan Selesai</p>
-                    <p class="font-body text-3xl font-bold text-emerald-700 mt-1">{{ $completedOrders }}</p>
-                    <p class="font-body text-xs text-neutral-400 mt-1">Telah diterima dengan baik →</p>
+                    <p class="font-body text-2xl font-bold text-emerald-700 mt-1">{{ $completedOrders }}</p>
+                    <p class="font-body text-[11px] text-neutral-400 mt-1">Pesanan sukses →</p>
                 </div>
-                <div class="w-12 h-12 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold group-hover:scale-105 transition">
-                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div class="w-10 h-10 rounded-lg bg-emerald-50 text-emerald-700 flex items-center justify-center font-bold group-hover:scale-105 transition">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                 </div>
             </a>
+
+            <!-- Total Spent -->
+            <div class="bg-white rounded-xl p-5 border border-neutral-200 shadow-1 flex items-center justify-between">
+                <div>
+                    <p class="font-body text-xs uppercase tracking-wider text-neutral-500 font-semibold">Total Belanja</p>
+                    <p class="font-body text-xl font-bold text-neutral-900 mt-1">Rp{{ number_format($totalSpent, 0, ',', '.') }}</p>
+                    <p class="font-body text-[11px] text-neutral-400 mt-1">Pesanan selesai</p>
+                </div>
+                <div class="w-10 h-10 rounded-lg bg-gold-50 text-gold-700 flex items-center justify-center font-bold">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+            </div>
         </div>
 
         <!-- Recent Orders Section -->

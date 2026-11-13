@@ -19,7 +19,7 @@
             <div class="absolute -right-8 -bottom-8 w-48 h-48 rounded-full border-8 border-gold-500/20 pointer-events-none"></div>
         </div>
 
-        <!-- Summary KPI Cards -->
+        <!-- Summary KPI Cards Row 1: Pesanan & Finansial -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             <!-- Pending Orders -->
             <a href="{{ route('admin.orders.index', ['status' => 'menunggu_konfirmasi']) }}" 
@@ -27,7 +27,7 @@
                 <div>
                     <p class="font-body text-xs uppercase tracking-wider text-neutral-500 font-semibold group-hover:text-gold-700 transition">Pesanan Baru</p>
                     <p class="font-body text-3xl font-bold text-primary-700 mt-1">{{ $pendingOrdersCount }}</p>
-                    <p class="font-body text-xs text-neutral-400 mt-1">Menunggu konfirmasi owner →</p>
+                    <p class="font-body text-xs text-neutral-400 mt-1">Menunggu konfirmasi →</p>
                 </div>
                 <div class="w-12 h-12 rounded-lg bg-gold-100 text-gold-700 flex items-center justify-center font-bold group-hover:scale-105 transition">
                     <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -36,11 +36,58 @@
                 </div>
             </a>
 
+            <!-- Processing Orders -->
+            <a href="{{ route('admin.orders.index', ['status' => 'diproses']) }}" 
+               class="bg-white rounded-xl p-5 border border-neutral-200 shadow-1 flex items-center justify-between hover:border-primary-400 hover:shadow-2 transition group">
+                <div>
+                    <p class="font-body text-xs uppercase tracking-wider text-neutral-500 font-semibold group-hover:text-primary-700 transition">Pesanan Diproses</p>
+                    <p class="font-body text-3xl font-bold text-primary-700 mt-1">{{ $processingOrdersCount }}</p>
+                    <p class="font-body text-xs text-neutral-400 mt-1">Disiapkan / jalan →</p>
+                </div>
+                <div class="w-12 h-12 rounded-lg bg-primary-100 text-primary-700 flex items-center justify-center font-bold group-hover:scale-105 transition">
+                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" />
+                    </svg>
+                </div>
+            </a>
+
+            <!-- Completed Orders -->
+            <a href="{{ route('admin.orders.index', ['status' => 'selesai']) }}" 
+               class="bg-white rounded-xl p-5 border border-neutral-200 shadow-1 flex items-center justify-between hover:border-emerald-400 hover:shadow-2 transition group">
+                <div>
+                    <p class="font-body text-xs uppercase tracking-wider text-neutral-500 font-semibold group-hover:text-emerald-700 transition">Pesanan Selesai</p>
+                    <p class="font-body text-3xl font-bold text-emerald-700 mt-1">{{ $completedOrdersCount }}</p>
+                    <p class="font-body text-xs text-neutral-400 mt-1">Transaksi sukses →</p>
+                </div>
+                <div class="w-12 h-12 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold group-hover:scale-105 transition">
+                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+            </a>
+
+            <!-- Revenue from Completed Orders -->
+            <div class="bg-white rounded-xl p-5 border border-neutral-200 shadow-1 flex items-center justify-between">
+                <div>
+                    <p class="font-body text-xs uppercase tracking-wider text-neutral-500 font-semibold">Total Pendapatan</p>
+                    <p class="font-body text-2xl font-bold text-neutral-900 mt-1">Rp{{ number_format($totalRevenue, 0, ',', '.') }}</p>
+                    <p class="font-body text-xs text-neutral-400 mt-1">Dari pesanan berstatus selesai</p>
+                </div>
+                <div class="w-12 h-12 rounded-lg bg-gold-50 text-gold-800 flex items-center justify-center font-bold">
+                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Summary KPI Cards Row 2: Pelanggan, Produk & Stok -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             <!-- Total Customers -->
             <a href="{{ route('admin.customers.index') }}" 
                class="bg-white rounded-xl p-5 border border-neutral-200 shadow-1 flex items-center justify-between hover:border-primary-400 hover:shadow-2 transition group">
                 <div>
-                    <p class="font-body text-xs uppercase tracking-wider text-neutral-500 font-semibold group-hover:text-primary-700 transition">Pelanggan</p>
+                    <p class="font-body text-xs uppercase tracking-wider text-neutral-500 font-semibold group-hover:text-primary-700 transition">Pelanggan Aktif</p>
                     <p class="font-body text-3xl font-bold text-primary-700 mt-1">{{ $totalCustomersCount }}</p>
                     <p class="font-body text-xs text-neutral-400 mt-1">Akun customer terdaftar →</p>
                 </div>
@@ -62,6 +109,21 @@
                 <div class="w-12 h-12 rounded-lg bg-primary-100 text-primary-700 flex items-center justify-center font-bold group-hover:scale-105 transition">
                     <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                </div>
+            </a>
+
+            <!-- Active Products -->
+            <a href="{{ route('admin.products.index') }}" 
+               class="bg-white rounded-xl p-5 border border-neutral-200 shadow-1 flex items-center justify-between hover:border-primary-400 hover:shadow-2 transition group">
+                <div>
+                    <p class="font-body text-xs uppercase tracking-wider text-neutral-500 font-semibold group-hover:text-primary-700 transition">Produk Aktif</p>
+                    <p class="font-body text-3xl font-bold text-primary-700 mt-1">{{ $activeProductsCount }}</p>
+                    <p class="font-body text-xs text-neutral-400 mt-1">Tampil di katalog publik →</p>
+                </div>
+                <div class="w-12 h-12 rounded-lg bg-canvas-sunken text-neutral-700 flex items-center justify-center font-bold group-hover:scale-105 transition">
+                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                     </svg>
                 </div>
             </a>

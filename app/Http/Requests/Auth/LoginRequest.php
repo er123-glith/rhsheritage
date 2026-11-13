@@ -42,6 +42,16 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
+        // Cek apakah akun terdaftar namun telah dinonaktifkan (soft-deleted)
+        $existing = \App\Models\User::withTrashed()->where('email', $this->input('email'))->first();
+        if ($existing && $existing->trashed()) {
+            RateLimiter::hit($this->throttleKey());
+
+            throw ValidationException::withMessages([
+                'email' => 'Akun Anda telah dinonaktifkan oleh administrator.',
+            ]);
+        }
+
         if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
 

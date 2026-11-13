@@ -338,8 +338,6 @@
                         @php
                             $activeVariants = $product->variants->where('is_active', true);
                             $minPrice = $activeVariants->min('price') ?? $product->base_price;
-                            $fakeDiscount = 15;
-                            $originalPrice = $minPrice * 1.15;
                             $stockQty = $activeVariants->sum('stock_quantity');
                         @endphp
                         <a href="{{ route('product.show', $product->slug) }}" data-aos="zoom-in" data-aos-delay="{{ 50 * ($index + 1) }}" class="bg-white rounded-xl p-3 text-neutral-800 shadow-1 hover:shadow-2 hover:-translate-y-1 transition duration-200 flex flex-col justify-between group">
@@ -353,10 +351,6 @@
                                             RHS HERITAGE
                                         </div>
                                     @endif
-                                    <!-- Discount Badge -->
-                                    <span class="absolute top-1.5 left-1.5 px-1.5 py-0.5 rounded bg-red-500 text-white font-mono text-[10px] font-bold">
-                                        -{{ $fakeDiscount }}%
-                                    </span>
                                 </div>
 
                                 <!-- Product Title -->
@@ -366,20 +360,24 @@
                             </div>
 
                             <div class="mt-2">
-                                <!-- Price -->
-                                <p class="font-body text-sm font-bold text-red-600">
+                                <!-- Actual Price from DB -->
+                                <p class="font-body text-sm font-bold text-primary-700">
                                     Rp{{ number_format($minPrice, 0, ',', '.') }}
                                 </p>
-                                <p class="font-body text-[10px] text-neutral-400 line-through">
-                                    Rp{{ number_format($originalPrice, 0, ',', '.') }}
-                                </p>
 
-                                <!-- Tokopedia Progress Bar -->
+                                <!-- Actual Stock Availability -->
                                 <div class="mt-2">
-                                    <div class="w-full bg-red-100 rounded-full h-1.5 overflow-hidden">
-                                        <div class="bg-red-500 h-1.5 rounded-full" style="width: 75%"></div>
-                                    </div>
-                                    <p class="text-[10px] text-red-600 font-semibold mt-1">Segera Habis</p>
+                                    @if($stockQty > 0)
+                                        <div class="flex items-center gap-1.5 text-[11px] text-emerald-700">
+                                            <span class="w-2 h-2 rounded-full bg-emerald-500 shrink-0"></span>
+                                            <span>Stok: {{ $stockQty }} unit</span>
+                                        </div>
+                                    @else
+                                        <div class="flex items-center gap-1.5 text-[11px] text-red-600">
+                                            <span class="w-2 h-2 rounded-full bg-red-500 shrink-0"></span>
+                                            <span>Habis</span>
+                                        </div>
+                                    @endif
                                 </div>
                             </div>
                         </a>
