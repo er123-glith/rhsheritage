@@ -44,17 +44,41 @@
         <span class="font-body text-[10px] font-semibold mt-0.5 leading-none">Keranjang</span>
     </a>
 
-    <!-- Grosir & Mitra -->
-    <a
-        href="{{ route('partnership.index') }}"
-        class="flex flex-col items-center justify-center flex-1 h-12 rounded-xl transition-all {{ request()->routeIs('partnership.*') ? 'bg-primary-700 dark:bg-primary-600 text-white font-bold shadow-xs' : 'text-neutral-600 dark:text-neutral-400 hover:text-primary-700 dark:hover:text-gold-400' }}"
-        aria-label="Grosir & Mitra"
-    >
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
-        </svg>
-        <span class="font-body text-[10px] font-semibold mt-0.5 leading-none">Grosir</span>
-    </a>
+    {{-- Navigasi Dinamis Berdasarkan Status Login --}}
+    @auth
+        @if(auth()->user()->isAdmin())
+            <a
+                href="{{ route('admin.dashboard') }}"
+                class="flex flex-col items-center justify-center flex-1 h-12 rounded-xl transition-all {{ request()->routeIs('admin.*') ? 'bg-primary-700 dark:bg-primary-600 text-white font-bold shadow-xs' : 'text-neutral-600 dark:text-neutral-400 hover:text-primary-700 dark:hover:text-gold-400' }}"
+                aria-label="Panel Admin"
+            >
+                <span class="text-base leading-none">👑</span>
+                <span class="font-body text-[10px] font-semibold mt-1 leading-none">Admin</span>
+            </a>
+        @else
+            <a
+                href="{{ route('customer.orders') }}"
+                class="flex flex-col items-center justify-center flex-1 h-12 rounded-xl transition-all {{ request()->routeIs('customer.orders') ? 'bg-primary-700 dark:bg-primary-600 text-white font-bold shadow-xs' : 'text-neutral-600 dark:text-neutral-400 hover:text-primary-700 dark:hover:text-gold-400' }}"
+                aria-label="Pesanan Saya"
+            >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                </svg>
+                <span class="font-body text-[10px] font-semibold mt-0.5 leading-none">Pesanan</span>
+            </a>
+        @endif
+    @else
+        <a
+            href="{{ route('login') }}"
+            class="flex flex-col items-center justify-center flex-1 h-12 rounded-xl transition-all {{ request()->routeIs('login') || request()->routeIs('register') ? 'bg-primary-700 dark:bg-primary-600 text-white font-bold shadow-xs' : 'text-neutral-600 dark:text-neutral-400 hover:text-primary-700 dark:hover:text-gold-400' }}"
+            aria-label="Masuk"
+        >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+            </svg>
+            <span class="font-body text-[10px] font-semibold mt-0.5 leading-none">Masuk</span>
+        </a>
+    @endauth
 
     <!-- Menu Drawer Trigger -->
     <button

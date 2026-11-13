@@ -10,18 +10,19 @@ use App\Http\Controllers\Admin\ProductImageController;
 use App\Http\Controllers\Admin\ShippingZoneController;
 use App\Http\Controllers\Admin\StockController;
 use App\Http\Controllers\Admin\VariantController;
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('admin')->group(function () {
-    // Guest routes
+    // Guest routes — halaman login tunggal untuk admin dan customer
     Route::middleware('guest')->group(function () {
-        Route::get('/login', [AuthController::class, 'showLoginForm'])->name('admin.login');
-        Route::post('/login', [AuthController::class, 'login']);
+        Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('admin.login');
+        Route::post('/login', [AuthenticatedSessionController::class, 'store']);
     });
 
-    // Authenticated Owner routes
+    // Authenticated Admin routes
     Route::middleware(['auth', 'verified.owner'])->group(function () {
-        Route::post('/logout', [AuthController::class, 'logout'])->name('admin.logout');
+        Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('admin.logout');
         Route::get('/', [DashboardController::class, 'index'])->name('admin.dashboard');
 
         // Produk & Galeri Foto

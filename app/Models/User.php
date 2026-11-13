@@ -15,6 +15,7 @@ class User extends Authenticatable
         'email',
         'password',
         'is_owner',
+        'role',
     ];
 
     protected $hidden = [
@@ -29,5 +30,20 @@ class User extends Authenticatable
             'password' => 'hashed',
             'is_owner' => 'boolean',
         ];
+    }
+
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin' || (bool) $this->is_owner;
+    }
+
+    public function isCustomer(): bool
+    {
+        return ! $this->isAdmin();
+    }
+
+    public function orders(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(\App\Models\Order::class);
     }
 }

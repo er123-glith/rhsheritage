@@ -43,21 +43,26 @@ class AuthorizationTest extends TestCase
         $response->assertRedirect('/admin');
     }
 
-    public function test_non_owner_cannot_authenticate_to_admin(): void
+    public function test_customer_authenticating_cannot_access_admin_dashboard(): void
     {
-        User::factory()->create([
-            'email' => 'user@example.com',
+        $customer = User::factory()->create([
+            'email' => 'customer@example.com',
             'password' => bcrypt('password123'),
             'is_owner' => false,
+            'role' => 'customer',
         ]);
 
-        $response = $this->post('/admin/login', [
-            'email' => 'user@example.com',
+        $response = $this->post('/login', [
+            'email' => 'customer@example.com',
             'password' => 'password123',
         ]);
 
-        $this->assertGuest();
-        $response->assertSessionHasErrors('email');
+        $this->assertAuthenticatedAs($customer);
+        $response->assertRedirect('/dashboard');
+
+        // Customer tidak boleh mengakses dashboard admin
+        $adminResponse = $this->actingAs($customer)->get('/admin');
+        $adminResponse->assertStatus(403);
     }
 
     public function test_non_owner_cannot_access_dashboard_directly(): void

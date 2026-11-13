@@ -13,6 +13,7 @@ class Order extends Model
     use HasFactory;
 
     protected $fillable = [
+        'user_id',
         'order_number',
         'customer_name',
         'customer_phone',
@@ -67,5 +68,10 @@ class Order extends Model
     public function shippingZone(): BelongsTo
     {
         return $this->belongsTo(ShippingZone::class);
+    }
+
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class);
     }
 }

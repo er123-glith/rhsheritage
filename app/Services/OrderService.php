@@ -132,6 +132,7 @@ class OrderService
 
             // Buat pesanan
             $order = Order::create([
+                'user_id'             => auth()->id(),
                 'order_number'        => $orderNumber,
                 'customer_name'       => $data->customerName,
                 'customer_phone'      => $data->customerPhone,

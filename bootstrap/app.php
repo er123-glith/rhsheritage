@@ -18,11 +18,13 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'verified.owner' => \App\Http\Middleware\EnsureOwner::class,
+            'role'           => \App\Http\Middleware\EnsureRole::class,
+            'cart.auth'      => \App\Http\Middleware\EnsureAuthenticatedForCart::class,
         ]);
 
         $middleware->redirectTo(
-            guests: '/admin/login',
-            users: '/admin',
+            guests: fn (\Illuminate\Http\Request $request) => $request->is('admin*') ? '/admin/login' : '/login',
+            users: fn (\Illuminate\Http\Request $request) => $request->user()?->isAdmin() ? '/admin' : '/',
         );
     })
     ->withExceptions(function (Exceptions $exceptions): void {

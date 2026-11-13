@@ -28,7 +28,25 @@
                 <span class="text-primary-700">|</span>
                 <a href="{{ route('partnership.index') }}" class="text-gold-400 hover:underline font-semibold">Harga Grosir & Kemitraan</a>
                 <span class="text-primary-700">|</span>
-                <a href="{{ route('admin.login') }}" class="text-primary-300 hover:text-white transition">Masuk Owner</a>
+                @guest
+                    <a href="{{ route('login') }}" class="text-primary-200 hover:text-white transition font-medium">Masuk</a>
+                    <span class="text-primary-700">|</span>
+                    <a href="{{ route('register') }}" class="text-gold-300 hover:text-white transition font-semibold">Daftar</a>
+                @endguest
+                @auth
+                    @if(auth()->user()->isAdmin())
+                        <a href="{{ route('admin.dashboard') }}" class="text-gold-300 hover:text-white transition font-bold">Dashboard Admin</a>
+                    @else
+                        <a href="{{ route('customer.orders') }}" class="text-primary-100 hover:text-white transition">Pesanan Saya</a>
+                        <span class="text-primary-700">|</span>
+                        <a href="{{ route('profile.edit') }}" class="text-gold-300 hover:text-white transition">Profil ({{ Str::limit(auth()->user()->name, 15) }})</a>
+                    @endif
+                    <span class="text-primary-700">|</span>
+                    <form method="POST" action="{{ route('logout') }}" class="inline">
+                        @csrf
+                        <button type="submit" class="text-rose-300 hover:text-rose-100 transition cursor-pointer text-xs">Keluar</button>
+                    </form>
+                @endauth
             </div>
         </div>
     </div>
@@ -74,12 +92,28 @@
                 <div class="flex items-center gap-2 sm:gap-4">
                     <!-- Nav Links for Desktop -->
                     <nav class="hidden md:flex items-center gap-1 font-body text-sm font-semibold text-neutral-700">
-                        <a href="{{ route('home') }}" class="px-3 py-2 text-white bg-primary-700 rounded-md hover:text-primary-700 transition-colors {{ request()->routeIs('home') ? 'text-primary-700 font-bold'  : '' }}">
+                        <a href="{{ route('home') }}" class="px-3 py-2 rounded-md hover:text-primary-700 transition-colors {{ request()->routeIs('home') ? 'text-primary-700 font-bold'  : '' }}">
                             Beranda
                         </a>
                         <a href="{{ route('catalog.index') }}" class="px-3 py-2 rounded-md hover:text-primary-700 transition-colors {{ request()->routeIs('catalog.*') ? 'text-primary-700 font-bold' : '' }}">
                             Katalog
                         </a>
+
+                        @auth
+                            @if(auth()->user()->isAdmin())
+                                <a href="{{ route('admin.dashboard') }}" class="px-3 py-1.5 rounded-md bg-gold-100 text-gold-900 border border-gold-300 font-bold text-xs hover:bg-gold-200 transition">
+                                    Panel Admin
+                                </a>
+                            @else
+                                <a href="{{ route('customer.orders') }}" class="px-3 py-2 rounded-md hover:text-primary-700 transition-colors {{ request()->routeIs('customer.orders') ? 'text-primary-700 font-bold' : '' }}">
+                                    Pesanan Saya
+                                </a>
+                                <a href="{{ route('profile.edit') }}" class="px-3 py-2 rounded-md hover:text-primary-700 transition-colors {{ request()->routeIs('profile.*') ? 'text-primary-700 font-bold' : '' }}">
+                                    Profil
+                                </a>
+                            @endif
+                        @endauth
+
                         <a href="{{ route('about') }}" class="px-3 py-2 rounded-md hover:text-primary-700 transition-colors {{ request()->routeIs('about') ? 'text-primary-700 font-bold' : '' }}">
                             Tentang
                         </a>
@@ -91,6 +125,28 @@
                             <span class="w-2 h-2 rounded-full bg-gold-600 animate-pulse"></span>
                             Grosir & Mitra
                         </a>
+
+                        @guest
+                            <div class="flex items-center gap-1.5 ml-2 pl-2 border-l border-neutral-200">
+                                <a href="{{ route('login') }}" class="px-3 py-1.5 rounded-md text-xs font-semibold text-primary-700 hover:bg-neutral-100 transition">
+                                    Masuk
+                                </a>
+                                <a href="{{ route('register') }}" class="px-3.5 py-1.5 rounded-md text-xs font-semibold bg-primary-700 hover:bg-primary-800 text-white shadow-xs transition">
+                                    Daftar
+                                </a>
+                            </div>
+                        @endguest
+
+                        @auth
+                            <div class="ml-2 pl-2 border-l border-neutral-200">
+                                <form method="POST" action="{{ route('logout') }}" class="inline">
+                                    @csrf
+                                    <button type="submit" class="px-2.5 py-1.5 rounded-md text-xs font-semibold text-rose-600 hover:bg-rose-50 transition cursor-pointer">
+                                        Keluar
+                                    </button>
+                                </form>
+                            </div>
+                        @endauth
                     </nav>
 
                     <!-- Cart Icon Button -->

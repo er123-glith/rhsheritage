@@ -10,7 +10,8 @@ class EnsureOwner
 {
     public function handle(Request $request, Closure $next): Response
     {
-        abort_unless($request->user()?->is_owner, 403, 'Akses ditolak. Halaman ini khusus untuk Owner RHS HERITAGE.');
+        $user = $request->user();
+        abort_unless($user && ($user->isAdmin() || $user->is_owner), 403, 'Akses ditolak. Halaman ini khusus untuk Administrator RHS HERITAGE.');
 
         return $next($request);
     }

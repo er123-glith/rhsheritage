@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Public\AboutController;
 use App\Http\Controllers\Public\CartController;
 use App\Http\Controllers\Public\CatalogController;
@@ -26,19 +27,6 @@ Route::get('/katalog/kategori/{category:slug}', [CatalogController::class, 'cate
 // Detail Produk
 Route::get('/produk/{product:slug}', [ProductController::class, 'show'])->name('product.show');
 
-// Keranjang Belanja
-Route::get('/keranjang', [CartController::class, 'index'])->name('cart.index');
-Route::post('/keranjang', [CartController::class, 'store'])->name('cart.store');
-Route::patch('/keranjang/{variantId}', [CartController::class, 'update'])->name('cart.update');
-Route::delete('/keranjang/{variantId}', [CartController::class, 'destroy'])->name('cart.destroy');
-
-// Checkout & Pesanan
-Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
-Route::post('/checkout/ongkir', [CheckoutController::class, 'shipping'])->name('checkout.shipping');
-Route::post('/checkout', [CheckoutController::class, 'store'])
-    ->middleware('throttle:5,1')
-    ->name('checkout.store');
-
 // Konfirmasi & Lacak Pesanan
 Route::get('/pesanan/{orderNumber}', [OrderController::class, 'confirmation'])->name('order.confirmation');
 Route::get('/lacak-pesanan', [OrderController::class, 'trackForm'])->name('order.track');
@@ -54,6 +42,49 @@ Route::post('/grosir-mitra', [PartnershipController::class, 'store'])
 
 // Tentang Kami
 Route::get('/tentang', [AboutController::class, 'index'])->name('about');
+
+/*
+|--------------------------------------------------------------------------
+| Fitur Transaksi — Terproteksi Autentikasi (Section D & G)
+|--------------------------------------------------------------------------
+*/
+
+// Keranjang Belanja — Proteksi khusus redirect dengan notifikasi ke login
+Route::middleware('cart.auth')->group(function () {
+    Route::get('/keranjang', [CartController::class, 'index'])->name('cart.index');
+    Route::post('/keranjang', [CartController::class, 'store'])->name('cart.store');
+    Route::patch('/keranjang/{variantId}', [CartController::class, 'update'])->name('cart.update');
+    Route::delete('/keranjang/{variantId}', [CartController::class, 'destroy'])->name('cart.destroy');
+});
+
+// Checkout — Wajib autentikasi pengguna
+Route::middleware(['auth', 'cart.auth'])->group(function () {
+    Route::get('/checkout', [CheckoutController::class, 'index'])->name('checkout.index');
+    Route::post('/checkout/ongkir', [CheckoutController::class, 'shipping'])->name('checkout.shipping');
+    Route::post('/checkout', [CheckoutController::class, 'store'])
+        ->middleware('throttle:5,1')
+        ->name('checkout.store');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Fitur Akun Customer & Profil (Section C.2 & E)
+|--------------------------------------------------------------------------
+*/
+Route::middleware('auth')->group(function () {
+    Route::get('/pesanan-saya', [OrderController::class, 'myOrders'])->name('customer.orders');
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
+    Route::get('/profil', [ProfileController::class, 'edit'])->name('profil');
+});
+
+// Dashboard redirect berdasarkan role
+Route::get('/dashboard', function () {
+    return auth()->user()?->isAdmin()
+        ? redirect()->route('admin.dashboard')
+        : redirect()->route('home');
+})->middleware(['auth'])->name('dashboard');
 
 // Helper route migrasi cPanel (bisa dihapus setelah setup selesai)
 Route::get('/setup-cpanel-migrate', function () {
@@ -82,3 +113,6 @@ Route::get('/setup-cpanel-migrate', function () {
             . '</pre>';
     }
 });
+
+// Rute Autentikasi Laravel Breeze
+require __DIR__.'/auth.php';

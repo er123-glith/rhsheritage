@@ -19,9 +19,28 @@ class OrderController extends Controller
             ->where('order_number', $orderNumber)
             ->firstOrFail();
 
+        // Otorisasi akses: customer tidak boleh melihat pesanan customer lain (SEC-05, Section G & H)
+        if ($order->user_id !== null) {
+            $user = auth()->user();
+            if (! $user || ($user->id !== $order->user_id && ! $user->isAdmin())) {
+                abort(403, 'Akses ditolak. Anda tidak memiliki izin untuk melihat pesanan ini.');
+            }
+        }
+
         $whatsappUrl = $wa->forOrder($order);
 
         return view('public.order.confirmation', compact('order', 'whatsappUrl'));
+    }
+
+    /** Tampilkan riwayat pesanan milik customer yang sedang login. */
+    public function myOrders()
+    {
+        $orders = Order::with(['orderItems', 'shippingZone'])
+            ->where('user_id', auth()->id())
+            ->latest()
+            ->paginate(10);
+
+        return view('public.order.my-orders', compact('orders'));
     }
 
     /** Tampilkan form pelacakan pesanan. */

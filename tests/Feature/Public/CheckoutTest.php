@@ -56,9 +56,33 @@ class CheckoutTest extends TestCase
         ]);
     }
 
-    public function test_can_place_order_successfully(): void
+    public function test_guest_cannot_place_order_and_is_redirected_to_login(): void
     {
         $response = $this->withSession([
+            'cart' => [
+                $this->variant->id => 1,
+            ],
+        ])->post('/checkout', [
+            'customer_name' => 'Rahmat Saputra',
+            'customer_phone' => '081213338952',
+            'address_line' => 'Jl. Merdeka No. 45',
+            'address_city' => 'Jakarta Selatan',
+            'address_province' => 'DKI Jakarta',
+            'address_postal_code' => '12345',
+            'shipping_zone_id' => $this->zone->id,
+        ]);
+
+        $response->assertRedirect(route('login'));
+        $this->assertNull(Order::first());
+    }
+
+    public function test_can_place_order_successfully(): void
+    {
+        $customer = \App\Models\User::factory()->create([
+            'role' => 'customer',
+        ]);
+
+        $response = $this->actingAs($customer)->withSession([
             'cart' => [
                 $this->variant->id => 1,
             ],

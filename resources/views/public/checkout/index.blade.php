@@ -85,7 +85,7 @@
                             <input
                                 type="text"
                                 name="customer_name"
-                                value="{{ old('customer_name') }}"
+                                value="{{ old('customer_name', auth()->user()?->name) }}"
                                 required
                                 placeholder="Contoh: Ahmad Fadilah"
                                 class="w-full h-11 px-3.5 rounded-md bg-canvas-sunken text-sm text-neutral-800 border border-neutral-200 focus:bg-white focus:border-primary-500 focus:outline-none"

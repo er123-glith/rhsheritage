@@ -52,7 +52,27 @@
                 <span class="text-primary-700">|</span>
                 <a href="{{ route('partnership.index') }}" class="text-gold-400 hover:underline font-semibold">Harga Grosir & Kemitraan</a>
                 <span class="text-primary-700">|</span>
-                <a href="{{ route('admin.login') }}" class="text-primary-300 hover:text-white transition">Masuk Owner</a>
+                @guest
+                    <a href="{{ route('login') }}" class="text-primary-200 hover:text-white transition font-medium">Masuk</a>
+                    <span class="text-primary-700">|</span>
+                    <a href="{{ route('register') }}" class="text-gold-300 hover:text-white transition font-semibold">Daftar</a>
+                @endguest
+                @auth
+                    @if(auth()->user()->isAdmin())
+                        <a href="{{ route('admin.dashboard') }}" class="text-gold-300 hover:text-white transition font-bold flex items-center gap-1">
+                            <span>👑</span> Dashboard Admin
+                        </a>
+                    @else
+                        <a href="{{ route('customer.orders') }}" class="text-primary-100 hover:text-white transition">Pesanan Saya</a>
+                        <span class="text-primary-700">|</span>
+                        <a href="{{ route('profile.edit') }}" class="text-gold-300 hover:text-white transition">Profil ({{ Str::limit(auth()->user()->name, 15) }})</a>
+                    @endif
+                    <span class="text-primary-700">|</span>
+                    <form method="POST" action="{{ route('logout') }}" class="inline">
+                        @csrf
+                        <button type="submit" class="text-rose-300 hover:text-rose-100 transition cursor-pointer text-xs">Keluar</button>
+                    </form>
+                @endauth
             </div>
         </div>
     </div>
@@ -104,9 +124,26 @@
                         <a href="{{ route('catalog.index') }}" class="px-3 py-2 rounded-lg hover:text-primary-700 dark:hover:text-gold-400 transition-colors {{ request()->routeIs('catalog.*') ? 'text-primary-700 dark:text-gold-400 font-bold' : '' }}">
                             Katalog
                         </a>
+
+                        @auth
+                            @if(auth()->user()->isAdmin())
+                                <a href="{{ route('admin.dashboard') }}" class="px-3 py-1.5 rounded-lg bg-gold-100 dark:bg-gold-950/60 text-gold-900 dark:text-gold-300 border border-gold-300/80 font-bold text-xs hover:bg-gold-200 transition">
+                                    Panel Admin
+                                </a>
+                            @else
+                                <a href="{{ route('customer.orders') }}" class="px-3 py-2 rounded-lg hover:text-primary-700 dark:hover:text-gold-400 transition-colors {{ request()->routeIs('customer.orders') ? 'text-primary-700 dark:text-gold-400 font-bold' : '' }}">
+                                    Pesanan Saya
+                                </a>
+                                <a href="{{ route('profile.edit') }}" class="px-3 py-2 rounded-lg hover:text-primary-700 dark:hover:text-gold-400 transition-colors {{ request()->routeIs('profile.*') ? 'text-primary-700 dark:text-gold-400 font-bold' : '' }}">
+                                    Profil
+                                </a>
+                            @endif
+                        @endauth
+
                         <a href="{{ route('about') }}" class="px-3 py-2 rounded-lg hover:text-primary-700 dark:hover:text-gold-400 transition-colors {{ request()->routeIs('about') ? 'text-primary-700 dark:text-gold-400 font-bold' : '' }}">
                             Tentang
                         </a>
+
                         <!-- Highlighted Grosir & Mitra button -->
                         <a
                             href="{{ route('partnership.index') }}"
@@ -115,6 +152,28 @@
                             <span class="w-2 h-2 rounded-full bg-gold-600 animate-pulse"></span>
                             Grosir & Mitra
                         </a>
+
+                        @guest
+                            <div class="flex items-center gap-1.5 ml-2 pl-2 border-l border-neutral-200 dark:border-neutral-700">
+                                <a href="{{ route('login') }}" class="px-3 py-1.5 rounded-lg text-xs font-semibold text-primary-700 dark:text-gold-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition">
+                                    Masuk
+                                </a>
+                                <a href="{{ route('register') }}" class="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-primary-700 hover:bg-primary-800 text-white shadow-xs transition">
+                                    Daftar
+                                </a>
+                            </div>
+                        @endguest
+
+                        @auth
+                            <div class="ml-2 pl-2 border-l border-neutral-200 dark:border-neutral-700">
+                                <form method="POST" action="{{ route('logout') }}" class="inline">
+                                    @csrf
+                                    <button type="submit" class="px-2.5 py-1.5 rounded-lg text-xs font-semibold text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition cursor-pointer">
+                                        Keluar
+                                    </button>
+                                </form>
+                            </div>
+                        @endauth
                     </nav>
 
                     <!-- Theme Toggle Button in Top Right Navbar -->
@@ -249,9 +308,28 @@
                 </a>
 
                 <div class="pt-3 border-t border-neutral-200 dark:border-neutral-700 mt-2 space-y-2">
+                    @auth
+                        @if(auth()->user()->isAdmin())
+                            <a
+                                href="{{ route('admin.dashboard') }}"
+                                class="flex items-center justify-between px-3.5 py-3 rounded-xl bg-gold-100 dark:bg-gold-950/60 text-gold-900 dark:text-gold-300 border border-gold-300 font-bold transition shadow-sm"
+                            >
+                                <span>👑 Panel Dashboard Admin</span>
+                                <span class="text-xs">&rarr;</span>
+                            </a>
+                        @else
+                            <a href="{{ route('customer.orders') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 {{ request()->routeIs('customer.orders') ? 'bg-primary-50 dark:bg-primary-900/50 text-primary-700 dark:text-gold-400 font-bold' : '' }}">
+                                <span>📦 Pesanan Saya</span>
+                            </a>
+                            <a href="{{ route('profile.edit') }}" class="flex items-center gap-3 px-3 py-2.5 rounded-xl text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 {{ request()->routeIs('profile.*') ? 'bg-primary-50 dark:bg-primary-900/50 text-primary-700 dark:text-gold-400 font-bold' : '' }}">
+                                <span>👤 Profil Saya</span>
+                            </a>
+                        @endif
+                    @endauth
+
                     <a
                         href="{{ route('partnership.index') }}"
-                        class="flex items-center justify-between px-3.5 py-3 rounded-xl bg-gold-100 text-gold-900 border border-gold-300 font-bold transition shadow-sm"
+                        class="flex items-center justify-between px-3.5 py-3 rounded-xl bg-gold-50 dark:bg-neutral-800 text-gold-900 dark:text-gold-300 border border-gold-300/60 font-bold transition shadow-sm"
                     >
                         <span>📦 Harga Grosir & Mitra</span>
                         <span class="text-xs">&rarr;</span>
@@ -273,10 +351,33 @@
             </nav>
 
             <div class="p-4 border-t border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-900/50 text-xs text-neutral-500">
-                <a href="{{ route('admin.login') }}" class="text-primary-700 dark:text-gold-400 font-semibold hover:underline block mb-1">
-                    Masuk Panel Owner &rarr;
-                </a>
-                <p>&copy; {{ date('Y') }} RHS HERITAGE</p>
+                @guest
+                    <div class="grid grid-cols-2 gap-2 mb-2">
+                        <a href="{{ route('login') }}" class="py-2.5 text-center rounded-lg border border-primary-700 text-primary-700 dark:text-gold-400 font-bold hover:bg-primary-50 transition">
+                            Masuk
+                        </a>
+                        <a href="{{ route('register') }}" class="py-2.5 text-center rounded-lg bg-primary-700 text-white font-bold hover:bg-primary-800 transition shadow-xs">
+                            Daftar
+                        </a>
+                    </div>
+                @endguest
+
+                @auth
+                    <div class="flex items-center justify-between pb-2 mb-2 border-b border-neutral-200 dark:border-neutral-700">
+                        <div>
+                            <span class="font-bold text-neutral-800 dark:text-white block">{{ auth()->user()->name }}</span>
+                            <span class="text-[10px] text-neutral-400 uppercase tracking-wider">{{ auth()->user()->isAdmin() ? 'Administrator' : 'Pelanggan' }}</span>
+                        </div>
+                        <form method="POST" action="{{ route('logout') }}">
+                            @csrf
+                            <button type="submit" class="text-rose-600 font-bold hover:underline cursor-pointer">
+                                Keluar
+                            </button>
+                        </form>
+                    </div>
+                @endauth
+
+                <p class="text-center text-[11px] text-neutral-400">&copy; {{ date('Y') }} RHS HERITAGE</p>
             </div>
         </div>
     </div>
