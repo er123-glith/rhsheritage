@@ -115,3 +115,4 @@ php artisan test
 4. **Rekomendasi Tahap Lanjutan**:
    - Menambahkan fitur ekspor data pelanggan ke format Excel/CSV pada menu admin bila diperlukan untuk kebutuhan pembukuan offline.
    - Menyediakan fitur notifikasi email otomatis ketika admin memperbarui nomor resi pengiriman.
+

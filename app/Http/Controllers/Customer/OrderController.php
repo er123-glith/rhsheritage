@@ -74,3 +74,4 @@ class OrderController extends Controller
         return view('customer.orders.show', compact('order', 'whatsappUrl'));
     }
 }
+
