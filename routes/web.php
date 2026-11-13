@@ -71,8 +71,14 @@ Route::middleware(['auth', 'cart.auth'])->group(function () {
 | Fitur Akun Customer & Profil (Section C.2 & E)
 |--------------------------------------------------------------------------
 */
+Route::middleware('auth')->prefix('customer')->name('customer.')->group(function () {
+    Route::get('/dashboard', [\App\Http\Controllers\Customer\DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/pesanan', [\App\Http\Controllers\Customer\OrderController::class, 'index'])->name('orders');
+    Route::get('/pesanan/{orderNumber}', [\App\Http\Controllers\Customer\OrderController::class, 'show'])->name('orders.show');
+});
+
 Route::middleware('auth')->group(function () {
-    Route::get('/pesanan-saya', [OrderController::class, 'myOrders'])->name('customer.orders');
+    Route::get('/pesanan-saya', fn () => redirect()->route('customer.orders'));
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
     Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
@@ -83,7 +89,7 @@ Route::middleware('auth')->group(function () {
 Route::get('/dashboard', function () {
     return auth()->user()?->isAdmin()
         ? redirect()->route('admin.dashboard')
-        : redirect()->route('home');
+        : redirect()->route('customer.dashboard');
 })->middleware(['auth'])->name('dashboard');
 
 // Helper route migrasi cPanel (bisa dihapus setelah setup selesai)

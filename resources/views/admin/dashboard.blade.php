@@ -12,7 +12,7 @@
                     Selamat Datang di Panel RHS HERITAGE
                 </h1>
                 <p class="font-body text-sm text-primary-100 leading-relaxed">
-                    Sistem informasi e-commerce kriya (songkok, sarung ATBM, dan jilbab sekolah). Kelola stok produk, konfirmasi pesanan masuk, tindak lanjuti kemitraan grosir, serta atur zona tarif ongkir.
+                    Sistem informasi e-commerce kriya (songkok, sarung ATBM, dan jilbab sekolah). Kelola stok produk, konfirmasi pesanan masuk, pantau akun pelanggan, tindak lanjuti kemitraan grosir, serta atur zona tarif ongkir.
                 </p>
             </div>
             <!-- Decorative Motif Accent -->
@@ -20,7 +20,7 @@
         </div>
 
         <!-- Summary KPI Cards -->
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6">
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             <!-- Pending Orders -->
             <a href="{{ route('admin.orders.index', ['status' => 'menunggu_konfirmasi']) }}" 
                class="bg-white rounded-xl p-5 border border-neutral-200 shadow-1 flex items-center justify-between hover:border-gold-400 hover:shadow-2 transition group">
@@ -36,13 +36,28 @@
                 </div>
             </a>
 
+            <!-- Total Customers -->
+            <a href="{{ route('admin.customers.index') }}" 
+               class="bg-white rounded-xl p-5 border border-neutral-200 shadow-1 flex items-center justify-between hover:border-primary-400 hover:shadow-2 transition group">
+                <div>
+                    <p class="font-body text-xs uppercase tracking-wider text-neutral-500 font-semibold group-hover:text-primary-700 transition">Pelanggan</p>
+                    <p class="font-body text-3xl font-bold text-primary-700 mt-1">{{ $totalCustomersCount }}</p>
+                    <p class="font-body text-xs text-neutral-400 mt-1">Akun customer terdaftar →</p>
+                </div>
+                <div class="w-12 h-12 rounded-lg bg-primary-50 text-primary-700 flex items-center justify-center font-bold group-hover:scale-105 transition">
+                    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                </div>
+            </a>
+
             <!-- Pending Partner Applications -->
             <a href="{{ route('admin.partners.index', ['status' => 'pending']) }}" 
                class="bg-white rounded-xl p-5 border border-neutral-200 shadow-1 flex items-center justify-between hover:border-primary-400 hover:shadow-2 transition group">
                 <div>
                     <p class="font-body text-xs uppercase tracking-wider text-neutral-500 font-semibold group-hover:text-primary-700 transition">Pengajuan Mitra</p>
                     <p class="font-body text-3xl font-bold text-primary-700 mt-1">{{ $pendingPartnersCount }}</p>
-                    <p class="font-body text-xs text-neutral-400 mt-1">Grosir & toko mitra baru →</p>
+                    <p class="font-body text-xs text-neutral-400 mt-1">Grosir & mitra baru →</p>
                 </div>
                 <div class="w-12 h-12 rounded-lg bg-primary-100 text-primary-700 flex items-center justify-center font-bold group-hover:scale-105 transition">
                     <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -57,7 +72,7 @@
                 <div>
                     <p class="font-body text-xs uppercase tracking-wider text-neutral-500 font-semibold group-hover:text-warning transition">Stok Menipis</p>
                     <p class="font-body text-3xl font-bold text-primary-700 mt-1">{{ $lowStockCount }}</p>
-                    <p class="font-body text-xs text-neutral-400 mt-1">Varian di bawah ambang batas →</p>
+                    <p class="font-body text-xs text-neutral-400 mt-1">Varian di bawah batas →</p>
                 </div>
                 <div class="w-12 h-12 rounded-lg bg-warning-bg text-warning flex items-center justify-center font-bold group-hover:scale-105 transition">
                     <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -91,6 +106,16 @@
                     <p class="font-body text-xs text-neutral-500">Konfirmasi pesanan, input nomor resi pengiriman, dan riwayat pesanan.</p>
                 </a>
 
+                <a href="{{ route('admin.customers.index') }}" class="p-4 rounded-lg bg-canvas-sunken border border-neutral-200 hover:border-primary-400 hover:bg-white transition block">
+                    <div class="flex items-center gap-2 text-primary-700 font-semibold font-body text-sm mb-1">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                        </svg>
+                        <span>Data Pelanggan</span>
+                    </div>
+                    <p class="font-body text-xs text-neutral-500">Pantau akun customer terdaftar, riwayat belanja, dan total transaksi.</p>
+                </a>
+
                 <a href="{{ route('admin.partners.index') }}" class="p-4 rounded-lg bg-canvas-sunken border border-neutral-200 hover:border-primary-400 hover:bg-white transition block">
                     <div class="flex items-center gap-2 text-primary-700 font-semibold font-body text-sm mb-1">
                         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -98,19 +123,75 @@
                         </svg>
                         <span>Grosir & Mitra</span>
                     </div>
-                    <p class="font-body text-xs text-neutral-500">Tindak lanjuti calon mitra toko dan permohonan harga grosir.</p>
-                </a>
-
-                <a href="{{ route('admin.shipping.index') }}" class="p-4 rounded-lg bg-canvas-sunken border border-neutral-200 hover:border-primary-400 hover:bg-white transition block">
-                    <div class="flex items-center gap-2 text-primary-700 font-semibold font-body text-sm mb-1">
-                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16V6a1 1 0 00-1-1H4a1 1 0 00-1 1v10a1 1 0 001 1h1m8-1a1 1 0 01-1 1H9m4-1V8a1 1 0 011-1h2.586a1 1 0 01.707.293l3.414 3.414a1 1 0 01.293.707V16a1 1 0 01-1 1h-1m-6-1a1 1 0 001 1h1M5 17a2 2 0 104 0m-4 0a2 2 0 114 0m6 0a2 2 0 104 0m-4 0a2 2 0 114 0" />
-                        </svg>
-                        <span>Zona Ongkir</span>
-                    </div>
-                    <p class="font-body text-xs text-neutral-500">Sesuaikan tarif dasar dan tarif per kg ekstra per wilayah pengiriman.</p>
+                    <p class="font-body text-xs text-neutral-500">Tindak lanjuti formulir permohonan kemitraan dan grosir.</p>
                 </a>
             </div>
+        </div>
+
+        <!-- Recent Incoming Orders -->
+        <div class="bg-white rounded-xl border border-neutral-200 shadow-1 overflow-hidden">
+            <div class="px-6 py-4 border-b border-neutral-200 flex items-center justify-between">
+                <div>
+                    <h2 class="font-display text-base font-bold text-primary-700">Pesanan Masuk Terbaru</h2>
+                    <p class="font-body text-xs text-neutral-400 mt-0.5">5 transaksi pesanan terakhir</p>
+                </div>
+                <a href="{{ route('admin.orders.index') }}" class="font-body text-xs font-semibold text-primary-700 hover:text-primary-900 transition flex items-center gap-1">
+                    <span>Lihat Semua</span>
+                    <span>→</span>
+                </a>
+            </div>
+
+            @if($recentOrders->isEmpty())
+                <div class="p-8 text-center text-xs text-neutral-400">
+                    Belum ada pesanan masuk.
+                </div>
+            @else
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left">
+                        <thead class="bg-canvas-sunken border-b border-neutral-200">
+                            <tr>
+                                <th class="px-6 py-3 font-body text-xs font-semibold uppercase tracking-wider text-neutral-500">No. Pesanan</th>
+                                <th class="px-6 py-3 font-body text-xs font-semibold uppercase tracking-wider text-neutral-500">Pelanggan</th>
+                                <th class="px-6 py-3 font-body text-xs font-semibold uppercase tracking-wider text-neutral-500">Total</th>
+                                <th class="px-6 py-3 font-body text-xs font-semibold uppercase tracking-wider text-neutral-500">Status</th>
+                                <th class="px-6 py-3 font-body text-xs font-semibold uppercase tracking-wider text-neutral-500 text-right">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-neutral-100 font-body text-sm">
+                            @foreach($recentOrders as $order)
+                                <tr class="hover:bg-canvas-sunken/40 transition">
+                                    <td class="px-6 py-3.5">
+                                        <a href="{{ route('admin.orders.show', $order) }}" class="font-mono font-bold text-primary-700 hover:underline">
+                                            #{{ $order->order_number }}
+                                        </a>
+                                        <div class="text-xs text-neutral-400 mt-0.5">{{ $order->created_at->translatedFormat('d M Y, H:i') }}</div>
+                                    </td>
+                                    <td class="px-6 py-3.5">
+                                        <div class="font-medium text-neutral-800">{{ $order->customer_name }}</div>
+                                        @if($order->user)
+                                            <span class="text-[10px] text-primary-700 font-semibold bg-primary-50 px-1.5 py-0.5 rounded border border-primary-200">Member</span>
+                                        @else
+                                            <span class="text-[10px] text-neutral-500 bg-neutral-100 px-1.5 py-0.5 rounded">Tamu</span>
+                                        @endif
+                                    </td>
+                                    <td class="px-6 py-3.5 font-bold text-neutral-900">
+                                        Rp{{ number_format($order->total, 0, ',', '.') }}
+                                    </td>
+                                    <td class="px-6 py-3.5">
+                                        <x-status-badge :status="$order->status" />
+                                    </td>
+                                    <td class="px-6 py-3.5 text-right">
+                                        <a href="{{ route('admin.orders.show', $order) }}" class="inline-flex items-center gap-1 px-2.5 py-1 rounded-md border border-neutral-300 text-xs font-semibold text-neutral-700 hover:bg-neutral-50 transition">
+                                            <span>Detail</span>
+                                            <span>→</span>
+                                        </a>
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @endif
         </div>
     </div>
 </x-layouts.admin>

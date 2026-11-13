@@ -57,14 +57,14 @@
             </a>
         @else
             <a
-                href="{{ route('customer.orders') }}"
-                class="flex flex-col items-center justify-center flex-1 h-12 rounded-xl transition-all {{ request()->routeIs('customer.orders') ? 'bg-primary-700 dark:bg-primary-600 text-white font-bold shadow-xs' : 'text-neutral-600 dark:text-neutral-400 hover:text-primary-700 dark:hover:text-gold-400' }}"
-                aria-label="Pesanan Saya"
+                href="{{ route('customer.dashboard') }}"
+                class="flex flex-col items-center justify-center flex-1 h-12 rounded-xl transition-all {{ request()->routeIs('customer.*') ? 'bg-primary-700 dark:bg-primary-600 text-white font-bold shadow-xs' : 'text-neutral-600 dark:text-neutral-400 hover:text-primary-700 dark:hover:text-gold-400' }}"
+                aria-label="Panel Akun"
             >
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                 </svg>
-                <span class="font-body text-[10px] font-semibold mt-0.5 leading-none">Pesanan</span>
+                <span class="font-body text-[10px] font-semibold mt-0.5 leading-none">Akun</span>
             </a>
         @endif
     @else

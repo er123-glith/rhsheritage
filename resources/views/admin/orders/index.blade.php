@@ -159,6 +159,21 @@
                                             </svg>
                                         </a>
                                     </div>
+                                    @if($order->user)
+                                        <div class="mt-1.5 flex items-center gap-1.5 flex-wrap">
+                                            <a href="{{ route('admin.customers.show', $order->user) }}" class="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[11px] font-semibold bg-primary-50 text-primary-700 hover:bg-primary-100 transition border border-primary-200">
+                                                <span>Member</span>
+                                                <span class="text-[9px]">↗</span>
+                                            </a>
+                                            <span class="text-[11px] text-neutral-400 font-mono truncate max-w-[140px]">{{ $order->user->email }}</span>
+                                        </div>
+                                    @else
+                                        <div class="mt-1.5">
+                                            <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[11px] font-medium bg-neutral-100 text-neutral-500">
+                                                Tamu / Pesanan Lama
+                                            </span>
+                                        </div>
+                                    @endif
                                 </td>
 
                                 <!-- Destination & Shipping Zone -->

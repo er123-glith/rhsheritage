@@ -19,7 +19,7 @@ class AuthenticatedSessionController extends Controller
         if (Auth::check()) {
             return Auth::user()->isAdmin()
                 ? redirect()->route('admin.dashboard')
-                : redirect()->route('home');
+                : redirect()->route('customer.dashboard');
         }
 
         return view('auth.login');

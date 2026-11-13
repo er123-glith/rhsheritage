@@ -63,6 +63,8 @@
                             <span>👑</span> Dashboard Admin
                         </a>
                     @else
+                        <a href="{{ route('customer.dashboard') }}" class="text-gold-300 hover:text-white transition font-bold">Dashboard Pelanggan</a>
+                        <span class="text-primary-700">|</span>
                         <a href="{{ route('customer.orders') }}" class="text-primary-100 hover:text-white transition">Pesanan Saya</a>
                         <span class="text-primary-700">|</span>
                         <a href="{{ route('profile.edit') }}" class="text-gold-300 hover:text-white transition">Profil ({{ Str::limit(auth()->user()->name, 15) }})</a>

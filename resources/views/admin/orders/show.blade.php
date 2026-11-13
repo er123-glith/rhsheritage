@@ -269,6 +269,29 @@
                     </div>
 
                     <div>
+                        <p class="text-xs uppercase tracking-wider text-neutral-400 font-semibold font-body">Status Akun Customer</p>
+                        @if($order->user)
+                            <div class="mt-1 p-2.5 rounded-lg bg-primary-50 border border-primary-200">
+                                <div class="flex items-center justify-between">
+                                    <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-bold bg-primary-700 text-white">
+                                        Member Terdaftar
+                                    </span>
+                                    <a href="{{ route('admin.customers.show', $order->user) }}" class="text-xs font-semibold text-primary-700 hover:text-primary-900 transition flex items-center gap-1">
+                                        <span>Lihat Profil</span>
+                                        <span>↗</span>
+                                    </a>
+                                </div>
+                                <p class="text-xs text-neutral-600 font-mono mt-1.5">{{ $order->user->email }}</p>
+                            </div>
+                        @else
+                            <div class="mt-1 p-2.5 rounded-lg bg-neutral-100 border border-neutral-200 text-xs text-neutral-600">
+                                <span class="font-semibold text-neutral-700">Tamu / Pelanggan Lama</span>
+                                <p class="text-[11px] text-neutral-400 mt-0.5">Pesanan dibuat sebelum sistem multi-role atau tanpa login.</p>
+                            </div>
+                        @endif
+                    </div>
+
+                    <div>
                         <p class="text-xs uppercase tracking-wider text-neutral-400 font-semibold font-body">Nomor Telepon / WhatsApp</p>
                         <p class="text-sm font-mono font-medium text-neutral-800 mt-0.5">{{ $order->customer_phone }}</p>
                     </div>

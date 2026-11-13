@@ -24,7 +24,7 @@ class OrderController extends Controller
         $cancelledCount = Order::where('status', OrderStatus::Dibatalkan)->count();
         $totalOrders = Order::count();
 
-        $query = Order::with(['items', 'shippingZone'])->orderBy('id', 'desc');
+        $query = Order::with(['items', 'shippingZone', 'user'])->orderBy('id', 'desc');
 
         // Filter status
         if ($status = $request->input('status')) {
@@ -64,7 +64,7 @@ class OrderController extends Controller
 
     public function show(Order $order): View
     {
-        $order->load(['items.variant.product.primaryImage', 'shippingZone', 'statusLogs']);
+        $order->load(['items.variant.product.primaryImage', 'shippingZone', 'statusLogs', 'user']);
 
         // Sanitasi nomor telepon pelanggan untuk link WhatsApp (e.g. 0812 -> 62812)
         $phone = preg_replace('/[^0-9]/', '', $order->customer_phone);

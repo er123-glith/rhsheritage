@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\CategoryController;
+use App\Http\Controllers\Admin\CustomerController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\PartnerApplicationController;
@@ -61,6 +62,10 @@ Route::prefix('admin')->group(function () {
         Route::post('/pesanan/{order}/konfirmasi', [OrderController::class, 'confirm'])->name('admin.orders.confirm');
         Route::post('/pesanan/{order}/batal', [OrderController::class, 'cancel'])->name('admin.orders.cancel');
         Route::post('/pesanan/{order}/status', [OrderController::class, 'updateStatus'])->name('admin.orders.status');
+
+        // Manajemen Pelanggan (Customer)
+        Route::get('/pelanggan', [CustomerController::class, 'index'])->name('admin.customers.index');
+        Route::get('/pelanggan/{customer}', [CustomerController::class, 'show'])->name('admin.customers.show');
 
         // Grosir & Mitra
         Route::get('/grosir-mitra', [PartnerApplicationController::class, 'index'])->name('admin.partners.index');
