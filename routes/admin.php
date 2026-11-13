@@ -15,6 +15,9 @@ use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('admin')->group(function () {
+    // Logout route — mendukung POST (standard form UI dengan CSRF) dan GET (graceful fallback browser / URL langsung)
+    Route::match(['get', 'post'], '/logout', [AuthenticatedSessionController::class, 'destroy'])->name('admin.logout');
+
     // Guest routes — halaman login tunggal untuk admin dan customer
     Route::middleware('guest')->group(function () {
         Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('admin.login');
@@ -23,7 +26,6 @@ Route::prefix('admin')->group(function () {
 
     // Authenticated Admin routes
     Route::middleware(['auth', 'verified.owner'])->group(function () {
-        Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])->name('admin.logout');
         Route::get('/', [DashboardController::class, 'index'])->name('admin.dashboard');
 
         // Produk & Galeri Foto
