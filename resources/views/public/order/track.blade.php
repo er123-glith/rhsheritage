@@ -92,7 +92,7 @@
                             <span class="font-mono text-base font-bold">{{ $order->tracking_number }}</span>
                         </div>
                         <span class="font-body text-xs text-gold-800">
-                            Ekspedisi: {{ $order->shipping_zone_name }}
+                            Ekspedisi: {{ $order->courier_name ?? $order->shipping_zone_name }}
                         </span>
                     </div>
                 @endif

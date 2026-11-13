@@ -73,5 +73,58 @@ class OrderController extends Controller
 
         return view('customer.orders.show', compact('order', 'whatsappUrl'));
     }
+
+    /**
+     * Konfirmasi penerimaan barang oleh customer dengan foto bukti dan persetujuan.
+     */
+    public function confirmDelivery(Request $request, string $orderNumber): \Illuminate\Http\RedirectResponse
+    {
+        $order = Order::where('order_number', $orderNumber)->firstOrFail();
+
+        // Otorisasi: Hanya customer pemilik pesanan yang sah
+        if ($order->user_id !== auth()->id()) {
+            abort(403, 'Akses ditolak. Anda tidak memiliki izin untuk mengonfirmasi pesanan ini.');
+        }
+
+        // Syarat: Pesanan harus dalam status 'Dikirim'
+        if ($order->status !== OrderStatus::Dikirim) {
+            return back()->with('error', "Pesanan tidak dapat dikonfirmasi pada status saat ini ({$order->status->label()}).");
+        }
+
+        // Syarat: Tidak boleh ada sengketa atau retur aktif yang belum tuntas
+        if ($order->hasActiveReturn()) {
+            return back()->with('error', 'Pesanan memiliki pengajuan retur aktif. Konfirmasi selesai tidak dapat dilakukan hingga retur terselesaikan.');
+        }
+
+        $validated = $request->validate([
+            'agreement'      => ['accepted'],
+            'delivery_proof' => ['required', 'file', 'mimes:jpg,jpeg,png,webp', 'max:5120'], // Max 5MB
+        ], [
+            'agreement.accepted'      => 'Anda wajib menyetujui pernyataan bahwa barang pesanan telah diterima dengan baik.',
+            'delivery_proof.required' => 'Foto bukti penerimaan barang wajib diunggah.',
+            'delivery_proof.mimes'    => 'Foto bukti penerimaan harus berformat JPG, JPEG, PNG, atau WEBP.',
+            'delivery_proof.max'      => 'Ukuran foto bukti penerimaan maksimal 5 MB.',
+        ]);
+
+        $proofPath = $request->file('delivery_proof')->store('secure_proofs/delivery', 'local');
+
+        \Illuminate\Support\Facades\DB::transaction(function () use ($order, $proofPath) {
+            $order->update([
+                'status'                => OrderStatus::Selesai,
+                'delivered_at'          => now(),
+                'delivery_proof_path'   => $proofPath,
+                'delivery_confirmed_by' => auth()->id(),
+            ]);
+
+            $order->statusLogs()->create([
+                'from_status' => OrderStatus::Dikirim->value,
+                'to_status'   => OrderStatus::Selesai->value,
+                'note'        => 'Pembeli telah mengonfirmasi penerimaan barang dan mengunggah foto bukti penerimaan.',
+                'created_at'  => now(),
+            ]);
+        });
+
+        return back()->with('status', "Pesanan #{$order->order_number} telah dikonfirmasi selesai. Terima kasih telah berbelanja di RHS Heritage!");
+    }
 }
 

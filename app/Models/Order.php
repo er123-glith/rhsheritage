@@ -31,6 +31,13 @@ class Order extends Model
         'status',
         'cancellation_reason',
         'tracking_number',
+        'courier_name',
+        'shipping_date',
+        'shipping_proof_path',
+        'shipping_note',
+        'delivered_at',
+        'delivery_proof_path',
+        'delivery_confirmed_by',
         'payload_json',
         'sent_to_wa_at',
         'confirmed_at',
@@ -39,13 +46,15 @@ class Order extends Model
     protected function casts(): array
     {
         return [
-            'payload_json' => 'array',
-            'status' => OrderStatus::class,
-            'sent_to_wa_at' => 'datetime',
-            'confirmed_at' => 'datetime',
-            'subtotal' => 'decimal:2',
-            'shipping_cost' => 'decimal:2',
-            'total' => 'decimal:2',
+            'payload_json'      => 'array',
+            'status'            => OrderStatus::class,
+            'sent_to_wa_at'     => 'datetime',
+            'confirmed_at'      => 'datetime',
+            'shipping_date'     => 'datetime',
+            'delivered_at'      => 'datetime',
+            'subtotal'          => 'decimal:2',
+            'shipping_cost'     => 'decimal:2',
+            'total'             => 'decimal:2',
             'total_weight_gram' => 'integer',
         ];
     }
@@ -73,5 +82,28 @@ class Order extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class)->withTrashed();
+    }
+
+    public function deliveryConfirmedBy(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'delivery_confirmed_by')->withTrashed();
+    }
+
+    public function returns(): HasMany
+    {
+        return $this->hasMany(OrderReturn::class, 'order_id')->latest();
+    }
+
+    /**
+     * Memeriksa apakah pesanan memiliki pengajuan retur aktif yang belum tuntas.
+     */
+    public function hasActiveReturn(): bool
+    {
+        return $this->returns()
+            ->whereNotIn('status', [
+                \App\Enums\ReturnStatus::Ditolak->value,
+                \App\Enums\ReturnStatus::Selesai->value,
+            ])
+            ->exists();
     }
 }

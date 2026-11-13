@@ -44,10 +44,11 @@
         @php
             $sidebarPendingOrders = \App\Models\Order::where('status', \App\Enums\OrderStatus::MenungguKonfirmasi)->count();
             $sidebarPendingPartners = \App\Models\PartnerApplication::where('is_followed_up', false)->count();
+            $sidebarPendingReturns = \App\Models\OrderReturn::where('status', \App\Enums\ReturnStatus::MenungguReview)->count();
         @endphp
         <aside 
             :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'"
-            class="fixed inset-y-0 left-0 z-50 w-72 bg-primary-700 text-white flex flex-col transition-transform duration-200 ease-in-out md:static md:translate-x-0 md:min-h-screen shrink-0 shadow-3 md:shadow-none"
+            class="fixed inset-y-0 left-0 z-50 w-72 h-screen bg-primary-700 text-white flex flex-col transition-transform duration-200 ease-in-out shrink-0 shadow-3 md:shadow-md"
         >
             <!-- Brand / Header -->
             <div class="h-20 px-6 flex items-center justify-between border-b border-primary-600">
@@ -120,6 +121,29 @@
                     @endif
                 </a>
 
+                <a href="{{ route('admin.returns.index') }}" class="flex items-center justify-between px-4 py-2.5 rounded-md font-body text-sm font-medium transition {{ request()->routeIs('admin.returns.*') ? 'bg-primary-800 text-gold-400 border-l-4 border-gold-500 font-semibold' : 'text-primary-100 hover:bg-primary-600 hover:text-white' }}">
+                    <span class="flex items-center gap-3">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3m9 14V5a2 2 0 00-2-2H6a2 2 0 00-2 2v16l4-2 4 2 4-2 4 2z" />
+                        </svg>
+                        <span>Manajemen Retur</span>
+                    </span>
+                    @if($sidebarPendingReturns > 0)
+                        <span class="px-2 py-0.5 rounded-full text-xs font-bold bg-amber-500 text-neutral-900 animate-pulse">
+                            {{ $sidebarPendingReturns }}
+                        </span>
+                    @endif
+                </a>
+
+                <a href="{{ route('admin.customers.index') }}" class="flex items-center justify-between px-4 py-2.5 rounded-md font-body text-sm font-medium transition {{ request()->routeIs('admin.customers.*') ? 'bg-primary-800 text-gold-400 border-l-4 border-gold-500 font-semibold' : 'text-primary-100 hover:bg-primary-600 hover:text-white' }}">
+                    <span class="flex items-center gap-3">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                        </svg>
+                        <span>Data Pelanggan</span>
+                    </span>
+                </a>
+
                 <a href="{{ route('admin.partners.index') }}" class="flex items-center justify-between px-4 py-2.5 rounded-md font-body text-sm font-medium transition {{ request()->routeIs('admin.partners.*') ? 'bg-primary-800 text-gold-400 border-l-4 border-gold-500 font-semibold' : 'text-primary-100 hover:bg-primary-600 hover:text-white' }}">
                     <span class="flex items-center gap-3">
                         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -164,7 +188,7 @@
         </aside>
 
         <!-- Main Content Area -->
-        <div class="flex-1 flex flex-col min-w-0">
+        <div class="flex-1 flex flex-col min-w-0 md:pl-72 min-h-screen">
             <!-- Mobile Topbar -->
             <header class="h-16 bg-white border-b border-neutral-200 px-4 flex items-center justify-between md:hidden shadow-1">
                 <button @click="sidebarOpen = true" class="p-2 text-neutral-700 hover:bg-neutral-50 rounded-md">

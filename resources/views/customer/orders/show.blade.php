@@ -1,7 +1,7 @@
 <x-layouts.customer>
     <x-slot:title>Detail Pesanan #{{ $order->order_number }}</x-slot:title>
 
-    <div class="space-y-6">
+    <div class="space-y-6" x-data="{ confirmDeliveryModalOpen: false }">
         <!-- Breadcrumb & Header -->
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 print:hidden">
             <nav class="flex items-center gap-2 font-body text-xs text-neutral-400">
@@ -16,7 +16,47 @@
                 <span class="text-neutral-700 font-medium font-mono">#{{ $order->order_number }}</span>
             </nav>
 
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2 flex-wrap">
+                <!-- Tombol Muat Ulang Status (Manual Refresh Tracking) -->
+                <button 
+                    onclick="window.location.reload()" 
+                    type="button" 
+                    class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-primary-300 bg-primary-50 text-primary-800 font-body text-xs font-semibold hover:bg-primary-100 transition shadow-xs"
+                    title="Perbarui status pesanan terbaru"
+                >
+                    <svg class="w-4 h-4 text-primary-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                    </svg>
+                    <span>Muat Ulang Status</span>
+                </button>
+
+                @if($order->status === \App\Enums\OrderStatus::Dikirim && ! $order->hasActiveReturn())
+                    <!-- Tombol Konfirmasi Barang Diterima -->
+                    <button 
+                        @click="confirmDeliveryModalOpen = true" 
+                        type="button" 
+                        class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-body text-xs font-bold transition shadow-xs"
+                    >
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        <span>Konfirmasi Barang Diterima</span>
+                    </button>
+                @endif
+
+                @if(in_array($order->status, [\App\Enums\OrderStatus::Dikirim, \App\Enums\OrderStatus::Selesai]) && ! $order->hasActiveReturn())
+                    <!-- Tombol Ajukan Retur -->
+                    <a 
+                        href="{{ route('customer.returns.create', $order->order_number) }}" 
+                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-amber-300 bg-amber-50 text-amber-900 font-body text-xs font-semibold hover:bg-amber-100 transition shadow-xs"
+                    >
+                        <svg class="w-4 h-4 text-amber-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3m9 14V5a2 2 0 00-2-2H6a2 2 0 00-2 2v16l4-2 4 2 4-2 4 2z" />
+                        </svg>
+                        <span>Ajukan Retur</span>
+                    </a>
+                @endif
+
                 <button 
                     onclick="window.print()" 
                     type="button" 
@@ -25,7 +65,7 @@
                     <svg class="w-4 h-4 text-neutral-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
                     </svg>
-                    <span>Cetak Bukti Pesanan</span>
+                    <span>Cetak Bukti</span>
                 </button>
             </div>
         </div>
@@ -241,9 +281,89 @@
                     </div>
 
                     @if($order->tracking_number)
-                        <div class="p-3.5 rounded-lg bg-primary-50 border border-primary-200">
-                            <p class="text-xs uppercase tracking-wider text-primary-700 font-bold font-body">Nomor Resi Pengiriman</p>
-                            <p class="text-base font-mono font-bold text-primary-900 mt-1 tracking-wider">{{ $order->tracking_number }}</p>
+                        <div class="p-4 rounded-xl bg-primary-50 border border-primary-200 space-y-3 font-body">
+                            <div class="flex items-center justify-between">
+                                <span class="text-xs font-bold uppercase tracking-wider text-primary-700">Ekspedisi Pengiriman</span>
+                                <span class="px-2 py-0.5 rounded bg-primary-700 text-white font-bold text-[10px]">J&T Express</span>
+                            </div>
+                            <div>
+                                <p class="text-[10px] text-neutral-500 uppercase tracking-wider">Nomor Resi J&T</p>
+                                <p class="text-base font-mono font-bold text-primary-900 tracking-wider">{{ $order->tracking_number }}</p>
+                            </div>
+                            @if($order->shipping_date)
+                                <div>
+                                    <p class="text-[10px] text-neutral-500 uppercase tracking-wider">Tanggal Kirim</p>
+                                    <p class="text-xs font-semibold text-neutral-800">{{ $order->shipping_date->translatedFormat('d F Y') }}</p>
+                                </div>
+                            @endif
+                            @if($order->shipping_proof_path)
+                                <div>
+                                    <p class="text-[10px] text-neutral-500 uppercase tracking-wider mb-1">Bukti Struk Resi</p>
+                                    <a 
+                                        href="{{ route('secure.proof', ['type' => 'shipping_proof', 'id' => $order->id, 'filename' => basename($order->shipping_proof_path)]) }}" 
+                                        target="_blank" 
+                                        class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-primary-300 text-primary-800 hover:bg-primary-100 text-xs font-semibold transition"
+                                    >
+                                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                        </svg>
+                                        <span>Lihat Foto Bukti Resi</span>
+                                    </a>
+                                </div>
+                            @endif
+                        </div>
+                    @endif
+
+                    @if($order->delivered_at)
+                        <div class="p-4 rounded-xl bg-emerald-50 border border-emerald-200 space-y-2.5 font-body">
+                            <div class="flex items-center gap-2 text-emerald-800 font-bold text-xs">
+                                <svg class="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                                </svg>
+                                <span>Barang Telah Diterima</span>
+                            </div>
+                            <p class="text-xs text-neutral-600">
+                                Dikonfirmasi pada {{ $order->delivered_at->translatedFormat('d M Y - H:i') }} WIB
+                            </p>
+                            @if($order->delivery_proof_path)
+                                <a 
+                                    href="{{ route('secure.proof', ['type' => 'delivery_proof', 'id' => $order->id, 'filename' => basename($order->delivery_proof_path)]) }}" 
+                                    target="_blank" 
+                                    class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-emerald-300 text-emerald-800 hover:bg-emerald-100 text-xs font-semibold transition"
+                                >
+                                    <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                    </svg>
+                                    <span>Lihat Foto Bukti Penerimaan</span>
+                                </a>
+                            @endif
+                        </div>
+                    @endif
+
+                    @if($order->returns->isNotEmpty())
+                        <div class="p-4 rounded-xl bg-amber-50 border border-amber-300 space-y-2 font-body">
+                            <span class="text-xs font-bold text-amber-900 block flex items-center gap-1.5">
+                                <svg class="w-4 h-4 text-amber-700" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                </svg>
+                                <span>Pengajuan Retur Anda</span>
+                            </span>
+                            @foreach($order->returns as $ret)
+                                <div class="p-2.5 bg-white rounded-lg border border-amber-200 text-xs flex items-center justify-between">
+                                    <div>
+                                        <p class="font-bold font-mono text-neutral-800">{{ $ret->return_number }}</p>
+                                        <p class="text-[11px] text-neutral-500">{{ $ret->solutionLabel() }}</p>
+                                    </div>
+                                    <div class="text-right">
+                                        <span class="inline-block px-2 py-0.5 rounded text-[10px] font-bold border {{ $ret->status->badgeClasses() }}">
+                                            {{ $ret->status->label() }}
+                                        </span>
+                                        <a href="{{ route('customer.returns.show', $ret->return_number) }}" class="block text-[11px] text-primary-700 font-semibold hover:underline mt-0.5">Lihat Retur →</a>
+                                    </div>
+                                </div>
+                            @endforeach
                         </div>
                     @endif
 
@@ -273,6 +393,81 @@
                         <span class="text-xs">↗</span>
                     </a>
                 </div>
+            </div>
+        </div>
+
+        <!-- Modal: Konfirmasi Barang Diterima -->
+        <div 
+            x-show="confirmDeliveryModalOpen" 
+            x-cloak
+            class="fixed inset-0 z-50 overflow-y-auto bg-neutral-900/60 backdrop-blur-xs flex items-center justify-center p-4"
+        >
+            <div 
+                @click.outside="confirmDeliveryModalOpen = false"
+                class="bg-white rounded-xl max-w-md w-full p-6 shadow-3 font-body"
+            >
+                <div class="flex items-center justify-between pb-3 border-b border-neutral-200">
+                    <h3 class="font-display text-lg font-bold text-primary-700 flex items-center gap-2">
+                        <svg class="w-5 h-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        <span>Konfirmasi Penerimaan Barang</span>
+                    </h3>
+                    <button @click="confirmDeliveryModalOpen = false" class="text-neutral-400 hover:text-neutral-600">✕</button>
+                </div>
+
+                <form method="POST" action="{{ route('customer.orders.confirm-delivery', $order->order_number) }}" enctype="multipart/form-data" class="mt-4 space-y-4">
+                    @csrf
+
+                    <p class="text-xs text-neutral-600 leading-relaxed">
+                        Pastikan Anda telah membuka dan memeriksa fisik barang pesanan sebelum mengonfirmasi. Setelah dikonfirmasi, status pesanan akan diselesaikan.
+                    </p>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-neutral-700 mb-1">
+                            Foto Bukti Penerimaan Barang <span class="text-danger">*</span>
+                            <span class="text-neutral-400 font-normal ml-1">(JPG, PNG, WEBP maks 5 MB)</span>
+                        </label>
+                        <input
+                            type="file"
+                            name="delivery_proof"
+                            required
+                            accept="image/jpeg,image/png,image/webp"
+                            class="w-full text-xs text-neutral-600 file:mr-3 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-primary-50 file:text-primary-700 hover:file:bg-primary-100 cursor-pointer"
+                        />
+                    </div>
+
+                    <div class="p-3 bg-amber-50 border border-amber-200 rounded-lg">
+                        <label class="flex items-start gap-2.5 cursor-pointer">
+                            <input
+                                type="checkbox"
+                                name="agreement"
+                                value="1"
+                                required
+                                class="w-4 h-4 mt-0.5 rounded border-neutral-300 text-primary-700 focus:ring-primary-500 cursor-pointer"
+                            />
+                            <span class="text-xs font-medium text-neutral-800 leading-snug">
+                                Saya menyatakan bahwa barang pesanan telah diterima dan sesuai dengan pesanan saya.
+                            </span>
+                        </label>
+                    </div>
+
+                    <div class="flex justify-end gap-2 pt-2 border-t border-neutral-100">
+                        <button 
+                            type="button" 
+                            @click="confirmDeliveryModalOpen = false" 
+                            class="px-4 py-2 rounded-lg text-xs font-semibold text-neutral-600 hover:bg-neutral-100"
+                        >
+                            Batal
+                        </button>
+                        <button 
+                            type="submit" 
+                            class="px-5 py-2 rounded-lg text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs"
+                        >
+                            Konfirmasi Selesai
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

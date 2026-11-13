@@ -106,9 +106,59 @@ class OrderController extends Controller
         return back()->with('status', "Pesanan #{$order->order_number} berhasil dibatalkan. Alasan: \"{$validated['cancellation_reason']}\".");
     }
 
+    /**
+     * Admin mengunggah resi J&T Express dan foto bukti pengiriman resmi (Tahap 4).
+     */
+    public function ship(Request $request, Order $order): RedirectResponse
+    {
+        if ($order->status !== OrderStatus::Diproses) {
+            return back()->with('error', "Pesanan hanya dapat dikirim jika berstatus 'Diproses'. Status saat ini: {$order->status->label()}.");
+        }
+
+        $validated = $request->validate([
+            'tracking_number' => ['required', 'string', 'max:60'],
+            'shipping_date'   => ['required', 'date'],
+            'shipping_proof'  => ['required', 'file', 'mimes:jpg,jpeg,png,webp', 'max:2048'],
+            'shipping_note'   => ['nullable', 'string', 'max:500'],
+        ], [
+            'tracking_number.required' => 'Nomor resi J&T Express wajib diisi.',
+            'shipping_date.required'   => 'Tanggal pengiriman wajib diisi.',
+            'shipping_proof.required'  => 'Foto bukti struk resi pengiriman wajib diunggah.',
+            'shipping_proof.mimes'     => 'Foto bukti pengiriman harus berformat JPG, JPEG, PNG, atau WEBP.',
+            'shipping_proof.max'       => 'Ukuran foto bukti resi maksimal 2 MB.',
+        ]);
+
+        $proofPath = $request->file('shipping_proof')->store('secure_proofs/shipping', 'local');
+
+        \Illuminate\Support\Facades\DB::transaction(function () use ($order, $validated, $proofPath) {
+            $order->update([
+                'status'              => OrderStatus::Dikirim,
+                'courier_name'        => 'J&T Express',
+                'tracking_number'     => trim($validated['tracking_number']),
+                'shipping_date'       => $validated['shipping_date'],
+                'shipping_proof_path' => $proofPath,
+                'shipping_note'       => $validated['shipping_note'] ?? null,
+            ]);
+
+            $order->statusLogs()->create([
+                'from_status' => OrderStatus::Diproses->value,
+                'to_status'   => OrderStatus::Dikirim->value,
+                'note'        => "Dikirim via J&T Express (No. Resi: {$validated['tracking_number']})",
+                'created_at'  => now(),
+            ]);
+        });
+
+        return back()->with('status', "Pesanan #{$order->order_number} berhasil dikirim via J&T Express.");
+    }
+
     public function updateStatus(Request $request, Order $order, OrderStatusService $service): RedirectResponse
     {
         $target = $request->input('target_status');
+
+        // Admin dilarang menyelesaikan pesanan normal secara sepihak
+        if ($target === OrderStatus::Selesai->value) {
+            return back()->with('error', 'Admin tidak memiliki aksi langsung untuk menyelesaikan pesanan normal. Penyelesaian pesanan normal dilakukan melalui konfirmasi penerimaan oleh pelanggan.');
+        }
 
         try {
             if ($target === OrderStatus::Dikirim->value) {
@@ -117,13 +167,10 @@ class OrderController extends Controller
                 ]);
                 $service->markShipped($order, $validated['tracking_number'] ?? null);
                 return back()->with('status', "Pesanan #{$order->order_number} berhasil ditandai sebagai 'Dikirim'.");
-            } elseif ($target === OrderStatus::Selesai->value) {
-                $service->markCompleted($order);
-                return back()->with('status', "Pesanan #{$order->order_number} berhasil diselesaikan.");
-            } else {
-                return back()->with('error', 'Target status tidak valid.');
             }
-        } catch (InvalidStatusTransitionException $e) {
+
+            return back()->with('error', 'Target status tidak valid.');
+        } catch (\App\Exceptions\InvalidStatusTransitionException $e) {
             return back()->with('error', $e->getMessage());
         }
     }

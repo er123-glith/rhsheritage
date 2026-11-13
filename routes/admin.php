@@ -9,6 +9,7 @@ use App\Http\Controllers\Admin\OrderController;
 use App\Http\Controllers\Admin\PartnerApplicationController;
 use App\Http\Controllers\Admin\ProductController;
 use App\Http\Controllers\Admin\ProductImageController;
+use App\Http\Controllers\Admin\ReturnController;
 use App\Http\Controllers\Admin\ShippingZoneController;
 use App\Http\Controllers\Admin\StockController;
 use App\Http\Controllers\Admin\VariantController;
@@ -75,6 +76,15 @@ Route::prefix('admin')->group(function () {
         Route::post('/pesanan/{order}/konfirmasi', [OrderController::class, 'confirm'])->name('admin.orders.confirm');
         Route::post('/pesanan/{order}/batal', [OrderController::class, 'cancel'])->name('admin.orders.cancel');
         Route::post('/pesanan/{order}/status', [OrderController::class, 'updateStatus'])->name('admin.orders.status');
+        Route::post('/pesanan/{order}/kirim', [OrderController::class, 'ship'])->name('admin.orders.ship');
+
+        // Manajemen Retur (Replacement & Refund)
+        Route::get('/retur', [ReturnController::class, 'index'])->name('admin.returns.index');
+        Route::get('/retur/{returnNumber}', [ReturnController::class, 'show'])->name('admin.returns.show');
+        Route::post('/retur/{returnNumber}/review', [ReturnController::class, 'review'])->name('admin.returns.review');
+        Route::post('/retur/{returnNumber}/verifikasi-barang', [ReturnController::class, 'verifyReceived'])->name('admin.returns.verify-received');
+        Route::post('/retur/{returnNumber}/proses-replacement', [ReturnController::class, 'processReplacement'])->name('admin.returns.process-replacement');
+        Route::post('/retur/{returnNumber}/proses-refund', [ReturnController::class, 'processRefund'])->name('admin.returns.process-refund');
 
         // Manajemen Pelanggan (Customer)
         Route::get('/pelanggan', [CustomerController::class, 'index'])->name('admin.customers.index');

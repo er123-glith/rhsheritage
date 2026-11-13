@@ -111,3 +111,4 @@ class CustomerPasswordController extends Controller
             ->with('status', "Kata sandi untuk pelanggan '{$customer->name}' berhasil diperbarui.");
     }
 }
+

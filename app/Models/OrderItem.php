@@ -40,4 +40,29 @@ class OrderItem extends Model
     {
         return $this->belongsTo(ProductVariant::class, 'product_variant_id');
     }
+
+    public function returnItems(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(ReturnItem::class, 'order_item_id');
+    }
+
+    /**
+     * Jumlah kuantitas yang sedang atau telah diajukan retur (kecuali yang ditolak).
+     */
+    public function activeReturnQuantity(): int
+    {
+        return (int) $this->returnItems()
+            ->whereHas('orderReturn', function ($q) {
+                $q->where('status', '!=', \App\Enums\ReturnStatus::Ditolak->value);
+            })
+            ->sum('quantity');
+    }
+
+    /**
+     * Sisa kuantitas item yang masih sah untuk diajukan retur.
+     */
+    public function remainingReturnableQuantity(): int
+    {
+        return max(0, $this->quantity - $this->activeReturnQuantity());
+    }
 }

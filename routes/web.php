@@ -75,7 +75,20 @@ Route::middleware('auth')->prefix('customer')->name('customer.')->group(function
     Route::get('/dashboard', [\App\Http\Controllers\Customer\DashboardController::class, 'index'])->name('dashboard');
     Route::get('/pesanan', [\App\Http\Controllers\Customer\OrderController::class, 'index'])->name('orders');
     Route::get('/pesanan/{orderNumber}', [\App\Http\Controllers\Customer\OrderController::class, 'show'])->name('orders.show');
+    Route::post('/pesanan/{orderNumber}/konfirmasi-terima', [\App\Http\Controllers\Customer\OrderController::class, 'confirmDelivery'])->name('orders.confirm-delivery');
+
+    // Manajemen Retur Customer (RMS)
+    Route::get('/retur', [\App\Http\Controllers\Customer\ReturnController::class, 'index'])->name('returns.index');
+    Route::get('/retur/ajukan/{orderNumber}', [\App\Http\Controllers\Customer\ReturnController::class, 'create'])->name('returns.create');
+    Route::post('/retur', [\App\Http\Controllers\Customer\ReturnController::class, 'store'])->name('returns.store');
+    Route::get('/retur/{returnNumber}', [\App\Http\Controllers\Customer\ReturnController::class, 'show'])->name('returns.show');
+    Route::post('/retur/{returnNumber}/kirim-resi', [\App\Http\Controllers\Customer\ReturnController::class, 'shipReturn'])->name('returns.ship');
+    Route::post('/retur/{returnNumber}/konfirmasi-pengganti', [\App\Http\Controllers\Customer\ReturnController::class, 'confirmReplacement'])->name('returns.confirm-replacement');
+    Route::post('/retur/{returnNumber}/konfirmasi-refund', [\App\Http\Controllers\Customer\ReturnController::class, 'confirmRefund'])->name('returns.confirm-refund');
 });
+
+// Endpoint unduh / lihat berkas bukti privat berotorisasi
+Route::middleware('auth')->get('/secure-proof/{type}/{id}/{filename}', [\App\Http\Controllers\SecureFileController::class, 'show'])->name('secure.proof');
 
 Route::middleware('auth')->group(function () {
     Route::get('/pesanan-saya', fn () => redirect()->route('customer.orders'));

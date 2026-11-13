@@ -45,9 +45,16 @@
         ></div>
 
         <!-- Sidebar Navigation -->
+        @php
+            $sidebarActiveReturns = auth()->check()
+                ? \App\Models\OrderReturn::where('user_id', auth()->id())
+                    ->whereNotIn('status', [\App\Enums\ReturnStatus::Selesai->value, \App\Enums\ReturnStatus::Ditolak->value])
+                    ->count()
+                : 0;
+        @endphp
         <aside 
             :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'"
-            class="fixed inset-y-0 left-0 z-50 w-72 bg-primary-700 text-white flex flex-col transition-transform duration-200 ease-in-out md:static md:translate-x-0 md:min-h-screen shrink-0 shadow-3 md:shadow-none"
+            class="fixed inset-y-0 left-0 z-50 w-72 h-screen bg-primary-700 text-white flex flex-col transition-transform duration-200 ease-in-out shrink-0 shadow-3 md:shadow-md"
         >
             <!-- Brand / Header -->
             <div class="h-20 px-6 flex items-center justify-between border-b border-primary-600">
@@ -75,13 +82,27 @@
                     <p class="px-4 font-body text-[10px] font-bold uppercase tracking-widest text-primary-300">Aktivitas Belanja</p>
                 </div>
 
-                <a href="{{ route('customer.orders') }}" class="flex items-center justify-between px-4 py-2.5 rounded-md font-body text-sm font-medium transition {{ request()->routeIs('customer.orders*') ? 'bg-primary-800 text-gold-400' : 'text-primary-200 hover:bg-primary-600 hover:text-white' }}">
+                <a href="{{ route('customer.orders') }}" class="flex items-center justify-between px-4 py-2.5 rounded-md font-body text-sm font-medium transition {{ request()->routeIs('customer.orders*') ? 'bg-primary-800 text-gold-400 font-semibold' : 'text-primary-200 hover:bg-primary-600 hover:text-white' }}">
                     <span class="flex items-center gap-3">
                         <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                         </svg>
                         <span>Pesanan Saya</span>
                     </span>
+                </a>
+
+                <a href="{{ route('customer.returns.index') }}" class="flex items-center justify-between px-4 py-2.5 rounded-md font-body text-sm font-medium transition {{ request()->routeIs('customer.returns*') ? 'bg-primary-800 text-gold-400 font-semibold' : 'text-primary-200 hover:bg-primary-600 hover:text-white' }}">
+                    <span class="flex items-center gap-3">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 15v-1a4 4 0 00-4-4H8m0 0l3 3m-3-3l3-3m9 14V5a2 2 0 00-2-2H6a2 2 0 00-2 2v16l4-2 4 2 4-2 4 2z" />
+                        </svg>
+                        <span>Retur Saya</span>
+                    </span>
+                    @if($sidebarActiveReturns > 0)
+                        <span class="px-2 py-0.5 rounded-full text-xs font-bold bg-amber-500 text-neutral-900">
+                            {{ $sidebarActiveReturns }}
+                        </span>
+                    @endif
                 </a>
 
                 <a href="{{ route('cart.index') }}" class="flex items-center justify-between px-4 py-2.5 rounded-md font-body text-sm font-medium transition {{ request()->routeIs('cart.*') ? 'bg-primary-800 text-gold-400' : 'text-primary-200 hover:bg-primary-600 hover:text-white' }}">
@@ -161,7 +182,7 @@
         </aside>
 
         <!-- Main Content Area -->
-        <div class="flex-1 flex flex-col min-w-0">
+        <div class="flex-1 flex flex-col min-w-0 md:pl-72 min-h-screen">
             <!-- Mobile Topbar -->
             <header class="h-16 bg-white border-b border-neutral-200 px-4 flex items-center justify-between md:hidden shadow-1">
                 <button @click="sidebarOpen = true" class="p-2 text-neutral-700 hover:bg-neutral-50 rounded-md" aria-label="Buka Menu">
