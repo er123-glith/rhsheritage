@@ -16,6 +16,8 @@ class OwnerSeeder extends Seeder
                 'name' => 'Owner RHS HERITAGE',
                 'password' => Hash::make(config('shop.owner_initial_password', 'password')),
                 'is_owner' => true,
+                'role' => 'admin',
+                'email_verified_at' => now(),
             ]
         );
 
@@ -25,6 +27,8 @@ class OwnerSeeder extends Seeder
                 'name' => 'Admin RHS HERITAGE',
                 'password' => Hash::make('12345678'),
                 'is_owner' => true,
+                'role' => 'admin',
+                'email_verified_at' => now(),
             ]
         );
     }
